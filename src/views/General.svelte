@@ -17,7 +17,6 @@
     });
   }
   onMount(() => {
-    console.log(process.env.LOL);
     browser.storage.local
       .get("name")
       .then((data) => {
@@ -30,7 +29,6 @@
 </script>
 
 <section>
-  {@html '\u003ciframe width="480" height="270" src="//www.youtube.com/embed/BKQVqzhnP8I" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen\u003e\u003c/iframe\u003e'}
   <article>
     <p>{msToDate($date)}</p>
     <div />
@@ -60,7 +58,7 @@
     text-align: center;
   }
   section {
-    width: 80%;
+    width: 70%;
     margin: auto;
   }
   iframe {
