@@ -1,6 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import browser from "webextension-polyfill";
+  import { getFromBrowserStorage } from "../helpers/manageStorage";
   import { date } from "../store/store";
   import { greeting, msToDate } from "../helpers/time";
   import DayliRoutine from "../components/DayliRoutine.svelte";
@@ -17,8 +18,7 @@
     });
   }
   onMount(() => {
-    browser.storage.local
-      .get("name")
+    getFromBrowserStorage("name")
       .then((data) => {
         name = data.name;
       })

@@ -5,11 +5,13 @@
 </script>
 
 <aside>
-  <ul>
-    {#each pages as page}
-      <li on:click={() => dispatch("changePage", page.state)}>{page.label}</li>
-    {/each}
-  </ul>
+  <nav>
+    <ul>
+      {#each pages as page}
+        <li on:click={() => dispatch("changePage", page.state)}>{page.label}</li>
+      {/each}
+    </ul>
+  </nav>
 </aside>
 
 <style>
