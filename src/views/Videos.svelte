@@ -4,6 +4,7 @@
   import { onMount } from "svelte";
   let video;
   let channelId;
+  let vid;
   const fetchChannelInfo = async (id) => {
     const getIDs = youtubeAPI.getChannelIDs(id);
     const getChannelInfo = youtubeAPI.getChannelInfo(id);
@@ -28,26 +29,18 @@
     let channelToStore = await fetchChannelInfo(channelId);
     setTobrowserStorage("video", channelToStore);
   };
-
-  onMount(() => {
-    getFromBrowserStorage("video")
-      .then((data) => {
-        video = data.video.uploadPlaylistId;
-      })
-      .then(() => {
-        console.log(video);
-        youtubeAPI.getPlaylistItems(video).then((resp) => {
-          console.log(resp);
-        });
-      });
+  const fetchLastVideo = () => {
+    return;
+  };
+  onMount(async () => {
+    const getPlayListId = await getFromBrowserStorage("video");
+    video = getPlayListId.video.uploadPlaylistId;
+    const getItemsFromPlaylist = await youtubeAPI.getPlaylistItems(video);
+    const lastVideoId = getItemsFromPlaylist.data.items[0].snippet.resourceId.videoId;
+    const getVideoPlayerInfo = await youtubeAPI.getVideoPlayer(lastVideoId);
+    const videoUrl = getVideoPlayerInfo.data.items[0].player.embedHtml;
+    vid = videoUrl.replace('src="', 'src="https:');
   });
 </script>
 
-<section>
-  {@html '\u003ciframe width="480" height="270" src="https://www.youtube.com/embed/BKQVqzhnP8I" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen\u003e\u003c/iframe\u003e'}
-  <div>
-    <input bind:value={channelId} type="text" />
-    <button on:click={storeChannelInfo}>Fetch</button>
-    <p>{JSON.stringify(video)}</p>
-  </div>
-</section>
+<section>lol</section>
