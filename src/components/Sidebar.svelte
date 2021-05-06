@@ -19,6 +19,7 @@
     position: fixed;
     top: 40%;
     left: 0%;
+    display: block;
   }
   li {
     cursor: pointer;

@@ -8,8 +8,7 @@ const api = axios.create({
 const API_KEY = process.env.YOUTUBE_API_KEY
 class YoutubeAPI{
 // It's only possible to retrieve data on channel with youtube ID channel
-    getPlaylistID(channelId) {
-        
+    getChannelIDs(channelId) {
         return api.get(`/channels?part=contentDetails&id=${channelId}&key=${API_KEY}`)
     }
     getChannelInfo(channelId){
