@@ -1,7 +1,6 @@
 <script>
   import { setTobrowserStorage, getFromBrowserStorage } from "../helpers/manageStorage";
   import browser from "webextension-polyfill";
-
   import { onMount } from "svelte";
   import Date from "./Date.svelte";
   import { timeStringToSeconds } from "../helpers/time";

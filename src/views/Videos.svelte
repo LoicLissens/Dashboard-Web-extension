@@ -43,4 +43,4 @@
   });
 </script>
 
-<section>lol</section>
+<section />

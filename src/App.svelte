@@ -9,7 +9,7 @@
     { label: "Articles", state: "articles" },
     { label: "Videos", state: "videos" },
   ];
-  let state = "videos";
+  let state = "general";
 </script>
 
 <main>
