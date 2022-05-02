@@ -1,5 +1,8 @@
 <script>
-  import { setTobrowserStorage, getFromBrowserStorage } from "../helpers/manageStorage";
+  import {
+    setTobrowserStorage,
+    getFromBrowserStorage,
+  } from "../helpers/manageStorage";
   import browser from "webextension-polyfill";
   import { onMount } from "svelte";
   import Date from "./Date.svelte";
@@ -10,7 +13,9 @@
     done: false,
   };
   let tasks = [];
-  $: sortedTasks = tasks.sort((a, b) => timeStringToSeconds(a.hour) - timeStringToSeconds(b.hour));
+  $: sortedTasks = tasks.sort(
+    (a, b) => timeStringToSeconds(a.hour) - timeStringToSeconds(b.hour)
+  );
   $: disabledButton = newTask.label && newTask.hour ? false : true;
   function addTask() {
     tasks = [...tasks, newTask];
@@ -38,7 +43,7 @@
   onMount(() => {
     getFromBrowserStorage("tasks")
       .then((data) => {
-        tasks = data.tasks;
+        tasks = data.tasks || [];
       })
       .catch((err) => {
         console.error(err);
@@ -58,7 +63,13 @@
       <div>
         <span>{task.hour}h</span>
         <span>{task.label}</span>
-        <span><input type="checkbox" bind:checked={task.done} on:change={updateTask} /></span>
+        <span
+          ><input
+            type="checkbox"
+            bind:checked={task.done}
+            on:change={updateTask}
+          /></span
+        >
         <span class="delete" on:click={removeTask(task.label)}>❌</span>
       </div>
     {/each}

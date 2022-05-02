@@ -7,6 +7,7 @@ import css from 'rollup-plugin-css-only';
 import { config } from 'dotenv';
 import replace from '@rollup/plugin-replace';
 const production = !process.env.ROLLUP_WATCH;
+import json from '@rollup/plugin-json';
 
 function serve() {
 	let server;
@@ -73,31 +74,32 @@ export default [{
 		// instead of npm run dev), minify
 		production && terser(),
 		replace({
-		FOO: 'bar',
-    	process: JSON.stringify({
-      	env: {
-         isProd: production,
-         ...config().parsed
-      } 
-   }),
-  }),
+			FOO: 'bar',
+			process: JSON.stringify({
+				env: {
+					isProd: production,
+					...config().parsed
+				}
+			}),
+		}),
+		json()
 	],
 	watch: {
 		clearScreen: false
 	}
 },
 {
-    input: "src/background.js",
-    output: {
-      sourcemap: true,
-      format: "iife",
-      file: "public/build/background.js",
-    },
-    plugins: [resolve(), commonjs()],
-    watch: {
-      clearScreen: false,
-    },
-  },
-  
+	input: "src/background.js",
+	output: {
+		sourcemap: true,
+		format: "iife",
+		file: "public/build/background.js",
+	},
+	plugins: [resolve(), commonjs()],
+	watch: {
+		clearScreen: false,
+	},
+},
+
 ]
 

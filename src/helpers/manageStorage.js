@@ -5,9 +5,8 @@ import browser from "webextension-polyfill";
  * @param {any} payload - the data to store
  * @returns {promise}
  */
-export const setTobrowserStorage = (key, payload) =>{
-    return  browser.storage.local.set({ [key]: payload })
-    
+export const setTobrowserStorage = (key, payload) => {
+    return browser.storage.local.set({ [key]: payload })
 }
 /**
  * A reusable function to get data from local browser storage
