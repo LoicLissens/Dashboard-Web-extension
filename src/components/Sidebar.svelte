@@ -1,5 +1,6 @@
 <script>
   import { createEventDispatcher } from "svelte";
+  import browser from "webextension-polyfill";
   export let pages;
   const dispatch = createEventDispatcher();
 </script>
@@ -8,8 +9,21 @@
   <nav>
     <ul>
       {#each pages as page}
-        <li on:click={() => dispatch("changePage", page.state)}>{page.label}</li>
+        <li on:click={() => dispatch("changePage", page.state)}>
+          {page.label}
+        </li>
       {/each}
+      <li>
+        <button
+          on:click={async () => console.log(await browser.storage.local.get())}
+          >Log all</button
+        >
+      </li>
+      <li>
+        <button on:click={async () => await browser.storage.local.clear()}
+          >clear</button
+        >
+      </li>
     </ul>
   </nav>
 </aside>
