@@ -19,7 +19,6 @@
   onMount(() => {
     getFromBrowserStorage("name")
       .then((data) => {
-        console.log(data);
         name = data.name;
       })
       .catch((err) => {

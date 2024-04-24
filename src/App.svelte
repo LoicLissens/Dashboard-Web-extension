@@ -1,25 +1,18 @@
 <script>
-  import browser from "webextension-polyfill";
-  import General from "./views/General.svelte";
+  import General from "./views/Home.svelte";
   import Sidebar from "./components/Sidebar.svelte";
   import Videos from "./views/Videos.svelte";
   const pages = [
-    { label: "General", state: "general" },
-    { label: "Dev's Ressources", state: "devsressources" },
-    { label: "Articles", state: "articles" },
+    { label: "Home", state: "home" },
     { label: "Videos", state: "videos" },
   ];
-  let state = "videos";
+  let state = "home";
 </script>
 
 <main>
   <Sidebar {pages} on:changePage={(e) => (state = e.detail)} />
-  {#if state === "general"}
+  {#if state === "home"}
     <General />
-  {:else if state === "devsressources"}
-    <p>issou</p>
-  {:else if state === "articles"}
-    <p>issou2</p>
   {:else if state === "videos"}
     <Videos />
   {/if}

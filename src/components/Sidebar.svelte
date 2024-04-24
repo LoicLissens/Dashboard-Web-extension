@@ -9,18 +9,22 @@
   <nav>
     <ul>
       {#each pages as page}
-        <li on:click={() => dispatch("changePage", page.state)}>
+      <li>
+        <button class="button" on:click={() => dispatch("changePage", page.state)}>
           {page.label}
-        </li>
+        </button>
+      </li>
       {/each}
+      <span><h1>Debug part</h1></span>
       <li>
         <button
-          on:click={async () => console.log(await browser.storage.local.get())}
+          class="button"
+          on:click={async () => window.alert(JSON.stringify(await browser.storage.local.get()))}
           >Log all</button
         >
       </li>
       <li>
-        <button on:click={async () => await browser.storage.local.clear()}
+        <button class="button" on:click={async () => await browser.storage.local.clear()}
           >clear</button
         >
       </li>

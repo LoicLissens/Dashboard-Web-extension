@@ -3,9 +3,7 @@
     setTobrowserStorage,
     getFromBrowserStorage,
   } from "../helpers/manageStorage";
-  import browser from "webextension-polyfill";
   import { onMount } from "svelte";
-  import Date from "./Date.svelte";
   import { timeStringToSeconds } from "../helpers/time";
   let newTask = {
     label: undefined,
@@ -52,11 +50,11 @@
 </script>
 
 <article>
-  <h2>Routine</h2>
+  <h2>Today task's:</h2>
   <div>
     <input bind:value={newTask.label} placeholder="Task" type="text" />
     <input type="time" bind:value={newTask.hour} min="00:00" max="23:59" />
-    <button disabled={disabledButton} on:click={addTask}>Add a task !</button>
+    <button class="button" disabled={disabledButton} on:click={addTask}>Add a task !</button>
   </div>
   {#if tasks.length > 0}
     {#each sortedTasks as task}
@@ -70,7 +68,7 @@
             on:change={updateTask}
           /></span
         >
-        <span class="delete" on:click={removeTask(task.label)}>❌</span>
+        <button class="delete" on:click={removeTask(task.label)}>❌</button>
       </div>
     {/each}
   {:else}
