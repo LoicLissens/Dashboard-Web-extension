@@ -31,11 +31,11 @@
   <p>{msToDate($date)}</p>
   <div />
   {#if !name}
-    <form on:submit|preventDefault={setName}>
-      <input name="name" type="text" />
-      <input type="submit" />
+    <form on:submit|preventDefault={setName} class="columns">
+      <input name="name" type="text"  placeholder="Name" class="input column is-narrow"/>
+      <input type="submit" class="button column is-narrow" />
       {#if nameError}
-        <p>{nameError}</p>
+        <p  class="column is-narrow">{nameError}</p>
       {/if}
     </form>
   {:else}

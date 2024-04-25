@@ -12,7 +12,7 @@
 <main>
   <Sidebar {pages} on:changePage={(e) => (state = e.detail)} />
   {#if state === "home"}
-    <General />
+    <General  />
   {:else if state === "videos"}
     <Videos />
   {/if}

@@ -1,10 +1,11 @@
 <script>
+  import { fade} from 'svelte/transition';
   import Todo from "../components/Todo.svelte";
   import Colors from "../components/Colors.svelte";
   import Greetings from "../components/Greetings.svelte";
 </script>
 
-<section>
+<section in:fade>
   <Greetings />
   <Todo />
   <Colors />

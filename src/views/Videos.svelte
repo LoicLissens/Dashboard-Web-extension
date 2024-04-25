@@ -1,4 +1,5 @@
 <script>
+  import { fade } from 'svelte/transition';
   import VideosConfig from "../components/VideosConfig.svelte";
   import VideoPlayer from "../components/VideoPlayer.svelte";
 
@@ -10,10 +11,11 @@
   onMount(async () => {
     const fetchedChannels = await getFromBrowserStorage("video");
     channels = fetchedChannels.video ? [...fetchedChannels.video] : [];
+    console.log(channels.length);
   });
 </script>
 
-<section>
+<section in:fade>
   <VideosConfig />
 
   {#if channels.length > 0}
