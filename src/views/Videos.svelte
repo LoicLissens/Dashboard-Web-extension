@@ -1,27 +1,30 @@
 <script>
   import { fade } from 'svelte/transition';
   import VideosConfig from "../components/VideosConfig.svelte";
-  import VideoPlayer from "../components/VideoPlayer.svelte";
+  import CategoryVideos from "../components/CategoryVideos.svelte";
 
   import { getFromBrowserStorage } from "../helpers/manageStorage";
   import { onMount } from "svelte";
 
   let channels = [];
+  let categories = [];
 
   onMount(async () => {
     const fetchedChannels = await getFromBrowserStorage("video");
+    console.log(fetchedChannels);
     channels = fetchedChannels.video ? [...fetchedChannels.video] : [];
-    console.log(channels.length);
+    channels.sort((a, b) => a.category.localeCompare(b.category));
+    const fetchedCategories =  await getFromBrowserStorage("categories")
+    categories = fetchedCategories.categories ? [...fetchedCategories.categories] : [];
+    console.log(categories);
   });
 </script>
 
 <section in:fade>
   <VideosConfig />
-
   {#if channels.length > 0}
-    <p>All your vieo</p>
-    {#each channels as channel}
-      <VideoPlayer {channel} />
+    {#each categories as category}
+      <CategoryVideos channels={channels.filter((c)=>c.category == category)} category={category} />
     {/each}
   {:else}
     <p>Loading</p>

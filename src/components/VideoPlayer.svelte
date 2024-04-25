@@ -1,6 +1,7 @@
 <script>
     import { onMount } from "svelte";
     import youtubeAPI from "../services/youtubeAPI";
+    import Divider from "./utils/Divider.svelte";
     export let channel;
     let embededVideo;
     const fetchLastVideo = async (uploadPlaylistId) => {
@@ -19,10 +20,18 @@
 </script>
 
 <div>
-    <h2>{channel.name}</h2>
-    <p>Category: {channel.category}</p>
-    <img src={channel.defaultAvatrUrl} alt="Channel avatar" />
+    <div class="is-flex">
+        <img class="small-image" src={channel.defaultAvatrUrl} alt="Channel avatar" />
+        <p>{channel.name}</p>
+    </div>
+    <Divider />
     {#if embededVideo}{@html embededVideo}{:else}
         <p>Load video</p>
     {/if}
 </div>
+<style>
+    .small-image {
+        width: 50px;  /* Adjust as needed */
+        height: 50px; /* Adjust as needed */
+    }
+</style>

@@ -75,21 +75,24 @@
 </script>
 
 <div class="bg-red">
-    <div>
-        <input bind:value={channelId} placeholder="channel ID" type="text" />
-    </div>
     {#if categories.length > 0}
-        <label for="category-select">Category:</label>
-        <select
-            bind:value={categoryToRegister}
-            name="pets"
-            id="category-select"
-        >
-            <option value="">Chose a category</option>
-            {#each categories as category}
-                <option value={category}>{category}</option>
-            {/each}
-        </select>
+        <div class="is-flex">
+            <div>
+                <input bind:value={channelId} placeholder="channel ID" type="text" class="input" />
+            </div>
+            <div class="select">
+                <select
+                bind:value={categoryToRegister}
+                name="pets"
+                id="category-select"
+            >
+                <option value="">Chose a category</option>
+                {#each categories as category}
+                    <option value={category}>{category}</option>
+                {/each}
+            </select>
+            </div>
+        </div>
     {:else}
         No categories registered
         <div>
@@ -98,12 +101,12 @@
                 placeholder="Category"
                 type="text"
             />
-            <button on:click={() => storeCatergory(categoryToRegister)}
+            <button  on:click={() => storeCatergory(categoryToRegister)}
                 >Register Category</button
             >
         </div>
     {/if}
-    <button on:click={() => storeChannelInfo(channelId, categoryToRegister)}>Register a video
+    <button class="button" disabled={!categoryToRegister || !channelId} on:click={() => storeChannelInfo(channelId, categoryToRegister)}>Register a video
     </button >
     {#if channelNotFound}
         <p>Channel could not be retrieved</p>
@@ -111,5 +114,4 @@
     {#if channelAlreadyStored}
         <p>Channel already stored</p>
     {/if}
-
 </div>

@@ -24,7 +24,7 @@
         >
       </li>
       <li>
-        <button class="button" on:click={async () => await browser.storage.local.clear()}
+        <button  class="button" on:click={async () => await browser.storage.local.clear()}
           >clear</button
         >
       </li>

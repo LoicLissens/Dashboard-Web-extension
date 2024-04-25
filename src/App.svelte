@@ -6,7 +6,7 @@
     { label: "Home", state: "home" },
     { label: "Videos", state: "videos" },
   ];
-  let state = "home";
+  let state = "videos";
 </script>
 
 <main>
@@ -23,5 +23,7 @@
     display: flex;
     justify-content: center;
     flex-direction: row;
+    height: 100vh; /* 100% of the viewport height */
+    width: 100vw; /* 80% of the viewport width */
   }
 </style>
