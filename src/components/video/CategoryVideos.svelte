@@ -1,13 +1,15 @@
 
 <script>
-    import VideoPlayer from "../components/VideoPlayer.svelte";
+    import VideoPlayer from "./VideoPlayer.svelte";
+    import Divider from "../utils/Divider.svelte";
 
     export let channels
     export let category
     let expanded = true
 </script>
-<div class="is-flex">
-    <span><p class="title is-2">{category}</p></span>
+
+<div class="is-flex  has-text-grey">
+    <span><p class="title is-3  has-text-grey">{category}</p></span>
     <span class="is-clickable is-flex"  on:click={() => expanded = !expanded}>
         {#if !expanded}
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" height="2rem" width="2rem">
@@ -20,8 +22,12 @@
         {/if}
     </span>
 </div>
+<div class="divider">
+    <Divider />
+</div>
   {#if expanded}
-  {#each channels as channel}
-      <VideoPlayer {channel} />
-  {/each}
+    {#each channels as channel}
+        <VideoPlayer {channel} />
+    {/each}
   {/if}
+

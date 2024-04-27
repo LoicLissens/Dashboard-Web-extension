@@ -1,7 +1,7 @@
 <script>
   import { fade } from 'svelte/transition';
-  import VideosConfig from "../components/VideosConfig.svelte";
-  import CategoryVideos from "../components/CategoryVideos.svelte";
+  import VideosConfig from "../components/video/VideosConfig.svelte";
+  import CategoryVideos from "../components/video/CategoryVideos.svelte";
 
   import { getFromBrowserStorage } from "../helpers/manageStorage";
   import { onMount } from "svelte";
@@ -11,16 +11,14 @@
 
   onMount(async () => {
     const fetchedChannels = await getFromBrowserStorage("video");
-    console.log(fetchedChannels);
     channels = fetchedChannels.video ? [...fetchedChannels.video] : [];
     channels.sort((a, b) => a.category.localeCompare(b.category));
     const fetchedCategories =  await getFromBrowserStorage("categories")
     categories = fetchedCategories.categories ? [...fetchedCategories.categories] : [];
-    console.log(categories);
   });
 </script>
 
-<section in:fade>
+<section  in:fade>
   <VideosConfig />
   {#if channels.length > 0}
     {#each categories as category}
@@ -30,3 +28,6 @@
     <p>Loading</p>
   {/if}
 </section>
+
+
+

@@ -4,17 +4,20 @@
   import { onMount } from "svelte";
   import browser from "webextension-polyfill";
   import { getFromBrowserStorage } from "../helpers/manageStorage";
+  import RegisterModal from "./RegisterModal.svelte";
   let name;
-  let nameError;
-  function setName(e) {
-    const val = e.target.elements.name.value;
-    if (!val) {
-      nameError = "This fields cannot be empty";
-    }
-    name = val;
-    browser.storage.local.set({ name: val }).catch((err) => {
-      console.log(err);
+  function remNAme(){ //TODO: Implement this function
+    browser.storage.local.set({ name: null }).catch((err) => {
+        console.log(err);
     });
+    name = null;
+  }
+  function setName(name) {
+      browser.storage.local.set({ name: name }).catch((err) => {
+        name = name;
+        console.log(err);
+    });
+    console.log(name);
   }
   onMount(() => {
     getFromBrowserStorage("name")
@@ -27,20 +30,12 @@
   });
 </script>
 
-<article>
-  <p>{msToDate($date)}</p>
-  <div />
-  {#if !name}
-    <form on:submit|preventDefault={setName} class="columns">
-      <input name="name" type="text"  placeholder="Name" class="input column is-narrow"/>
-      <input type="submit" class="button column is-narrow" />
-      {#if nameError}
-        <p  class="column is-narrow">{nameError}</p>
-      {/if}
-    </form>
-  {:else}
+<RegisterModal isModalActive={!name} on:setName={e => setName(e.detail.name)} />
+<div class="navbar-item">
+  <p class="mx-2">{msToDate($date)}</p>
+  {#if name}
     <div>
       <p>{greeting($date)} {name}</p>
     </div>
   {/if}
-</article>
+  </div>

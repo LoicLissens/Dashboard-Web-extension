@@ -4,7 +4,7 @@ export const greeting = (timeStamp) => {
     if (hours >= 5 && hours < 12) greeting = "Good morning";
     if (hours >= 12 && hours < 18) greeting = "Good afternoon";
     if (hours >= 18 && hours < 23) greeting = "Good evening";
-    if (hours < 5) greeting = "Good night";
+    if ( hours >= 23 || hours < 5) greeting = "Good night";
     return greeting;
 };
 export const msToDate = (timeStamp) => {
