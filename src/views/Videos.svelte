@@ -24,8 +24,6 @@
     {#each categories as category}
       <CategoryVideos channels={channels.filter((c)=>c.category == category)} category={category} />
     {/each}
-  {:else}
-    <p>Loading</p>
   {/if}
 </section>
 

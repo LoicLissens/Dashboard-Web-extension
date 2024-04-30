@@ -6,10 +6,11 @@
         getFromBrowserStorage,
     } from "../../helpers/manageStorage";
     import { addNotification } from "../../store/store";
+    import RegisterCategoryModal  from "./RegisterCategoryModal.svelte";
 
     let channelId = "";
-    let categoryToRegister = "";
     let categories = [];
+    let categoryChannel = "";
     let isAddingChannel = false;
     let isError = false;
 
@@ -55,7 +56,10 @@
             return;
         }
         try {
-            const channelToStore = await fetchChannelInfo(InputChannelId, category);
+            const channelToStore = await fetchChannelInfo(
+                InputChannelId,
+                category,
+            );
             const toStore = [...videos, channelToStore];
             await setTobrowserStorage("video", toStore);
             addNotification({
@@ -73,15 +77,6 @@
                 status: "error",
             });
         }
-    };
-    const storeCatergory = async (category) => {
-        const stockedCatergories = await getFromBrowserStorage("categories");
-        const tempCategories = stockedCatergories.categories
-            ? [...stockedCatergories.categories]
-            : [];
-        await setTobrowserStorage("categories", [...tempCategories, category]);
-        categories = [...tempCategories, category];
-        categoryToRegister = "";
     };
 
     onMount(async () => {
@@ -104,7 +99,7 @@
         </div>
         <div class="select px-2">
             <select
-                bind:value={categoryToRegister}
+                bind:value={categoryChannel}
                 name="pets"
                 id="category-select"
             >
@@ -114,28 +109,30 @@
                 {/each}
             </select>
         </div>
-    {:else}
-        <p>No categories registered</p>
-        <div>
-            <input
-                bind:value={categoryToRegister}
-                placeholder="Category"
-                type="text"
-            />
-            <button on:click={() => storeCatergory(categoryToRegister)}>Register Category</button>
-        </div>
-    {/if}
-    <button
-        class="button is-primary is-outlined has-text-grey"
-        disabled={isAddingChannel || !categoryToRegister || !channelId}
-        on:click={() => storeChannelInfo(channelId, categoryToRegister)}
+        <button
+            class="button is-primary is-outlined has-text-grey"
+            disabled={isAddingChannel || !categoryChannel || !channelId}
+            on:click={() => storeChannelInfo(channelId, categoryChannel)}
         >
-        <span class="icon">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-              </svg>
-        </span>
-        <span>Register a channel</span>
-    </button>
+            <span class="icon">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="w-6 h-6"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M12 4.5v15m7.5-7.5h-15"
+                    />
+                </svg>
+            </span>
+            <span>Register a channel</span>
+        </button>
+    {:else}
+        <RegisterCategoryModal />
+    {/if}
 </div>
-

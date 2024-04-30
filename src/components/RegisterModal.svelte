@@ -19,7 +19,7 @@
     }
   </script>
 
-  <div class={`modal ${isModalActive ? 'is-active' : ''}`}>
+  <div class="modal {isModalActive && 'is-active'}">
     <div class="modal-background blur"></div>
     <div class="modal-content">
       <div class="box">
