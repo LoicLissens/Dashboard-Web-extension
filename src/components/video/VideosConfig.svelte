@@ -10,10 +10,12 @@
     let channelId = "";
     let categoryToRegister = "";
     let categories = [];
+    let isAddingChannel = false;
+    let isError = false;
 
-    const fetchChannelInfo = async (channelId, category = "Others") => {
-        const getIDs = youtubeAPI.getChannelIDs(channelId);
-        const getChannelInfo = youtubeAPI.getChannelInfo(channelId);
+    const fetchChannelInfo = async (InputChannelId, category = "Others") => {
+        const getIDs = youtubeAPI.getChannelIDs(InputChannelId);
+        const getChannelInfo = youtubeAPI.getChannelInfo(InputChannelId);
         const data = await Promise.all([getIDs, getChannelInfo]).then(
             (resp) => {
                 try {
@@ -39,21 +41,33 @@
         );
         return data;
     };
-    const storeChannelInfo = async (channelId, category = "Others") => {
+    const storeChannelInfo = async (InputChannelId, category = "Others") => {
+        isAddingChannel = true;
         const stockedVideo = await getFromBrowserStorage("video");
         const videos = stockedVideo.video ? [...stockedVideo.video] : [];
-        if (videos.some((e) => e.channelId === channelId)) {
+        if (videos.some((e) => e.channelId === InputChannelId)) {
             addNotification({
                 message: "Channel already stored",
                 status: "error",
             });
+            isAddingChannel = false;
+            isError = true;
             return;
         }
         try {
-            const channelToStore = await fetchChannelInfo(channelId, category);
+            const channelToStore = await fetchChannelInfo(InputChannelId, category);
             const toStore = [...videos, channelToStore];
             await setTobrowserStorage("video", toStore);
+            addNotification({
+                message: "Channel stored",
+                status: "success",
+            });
+            isAddingChannel = false;
+            channelId = "";
+            isError = false;
         } catch (e) {
+            isAddingChannel = false;
+            isError = true;
             addNotification({
                 message: "Channel not found",
                 status: "error",
@@ -69,6 +83,7 @@
         categories = [...tempCategories, category];
         categoryToRegister = "";
     };
+
     onMount(async () => {
         const tempCategories = await getFromBrowserStorage("categories");
         categories = tempCategories.categories
@@ -79,12 +94,12 @@
 
 <div class="is-inline-flex my-3 box">
     {#if categories.length > 0}
-        <div>
+        <div class="control {isAddingChannel && 'is-loading'}">
             <input
                 bind:value={channelId}
                 placeholder="channel ID"
                 type="text"
-                class="input"
+                class="input {isError && 'is-danger'}"
             />
         </div>
         <div class="select px-2">
@@ -93,7 +108,7 @@
                 name="pets"
                 id="category-select"
             >
-                <option>Chose a category</option>
+                <option value="">Chose a category</option>
                 {#each categories as category}
                     <option value={category}>{category}</option>
                 {/each}
@@ -112,7 +127,7 @@
     {/if}
     <button
         class="button is-primary is-outlined has-text-grey"
-        disabled={!categoryToRegister || !channelId}
+        disabled={isAddingChannel || !categoryToRegister || !channelId}
         on:click={() => storeChannelInfo(channelId, categoryToRegister)}
         >
         <span class="icon">

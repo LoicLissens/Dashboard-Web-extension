@@ -5,10 +5,10 @@
 
     export let channels
     export let category
-    let expanded = true
+    export let expanded = false
 </script>
 
-<div class="is-flex  has-text-grey">
+<div class="is-flex has-text-grey">
     <span><p class="title is-3  has-text-grey">{category}</p></span>
     <span class="is-clickable is-flex"  on:click={() => expanded = !expanded}>
         {#if !expanded}
