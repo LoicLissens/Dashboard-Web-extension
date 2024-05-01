@@ -42,3 +42,9 @@
         </div>
     </div>
 </nav>
+
+<style scoped>
+button :hover{
+    scale: 1.03;
+}
+</style>

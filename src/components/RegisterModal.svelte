@@ -2,20 +2,17 @@
     import { createEventDispatcher } from 'svelte';
 
     export let isModalActive = true;
-    let nameError;
+    let isDanger = false;
 
     const dispatch = createEventDispatcher();
-    const toggleModal = () => {
-      isModalActive = !isModalActive;
-    };
     function setName (e) {
       e.preventDefault();
       const val = e.target.elements.name.value;
       if (!val) {
-        nameError = "This fields cannot be empty";
+        isDanger = true;
+        return
       }
       dispatch('setName', { name: val });
-      toggleModal();
     }
   </script>
 
@@ -23,22 +20,13 @@
     <div class="modal-background blur"></div>
     <div class="modal-content">
       <div class="box">
-        <h1 class="title has-text-grey">Register your name</h1>
-        <form on:submit|preventDefault={setName} class="columns">
+        <h1 class="title has-text-grey has-text-centered">Register your name</h1>
+        <form on:submit|preventDefault={setName} class="is-flex is-justify-content-center">
           <div class="control">
-            <input name="name" type="text"  placeholder="Name" class="input column is-narrow"/>
+            <input name="name" type="text"  placeholder="Name" class="input is-narrow {isDanger && 'is-danger'}"/>
           </div>
-          <input type="submit" class="button column is-narrow ml-2" />
-          {#if nameError}
-            <p  class="column is-narrow">{nameError}</p>
-          {/if}
+          <input type="submit" class="button ml-2" />
         </form>
       </div>
     </div>
   </div>
-
-  <style>
-    .blur {
-      backdrop-filter: blur(5px);
-    }
-  </style>

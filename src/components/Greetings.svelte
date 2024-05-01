@@ -6,18 +6,15 @@
   import { getFromBrowserStorage } from "../helpers/manageStorage";
   import RegisterModal from "./RegisterModal.svelte";
   let name;
-  function remNAme(){ //TODO: Implement this function
-    browser.storage.local.set({ name: null }).catch((err) => {
+
+  function setName(registeredName) {
+      browser.storage.local.set({ name: registeredName })
+      .then(() => {
+        name = registeredName;
+      })
+      .catch((err) => {
         console.log(err);
     });
-    name = null;
-  }
-  function setName(name) {
-      browser.storage.local.set({ name: name }).catch((err) => {
-        name = name;
-        console.log(err);
-    });
-    console.log(name);
   }
   onMount(() => {
     getFromBrowserStorage("name")

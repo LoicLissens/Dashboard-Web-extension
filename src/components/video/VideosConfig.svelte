@@ -6,13 +6,14 @@
         getFromBrowserStorage,
     } from "../../helpers/manageStorage";
     import { addNotification } from "../../store/store";
-    import RegisterCategoryModal  from "./RegisterCategoryModal.svelte";
+    import RegisterCategoryModal from "./RegisterCategoryModal.svelte";
 
     let channelId = "";
     let categories = [];
     let categoryChannel = "";
     let isAddingChannel = false;
     let isError = false;
+    let isModalActive = false;
 
     const fetchChannelInfo = async (InputChannelId, category = "Others") => {
         const getIDs = youtubeAPI.getChannelIDs(InputChannelId);
@@ -84,11 +85,18 @@
         categories = tempCategories.categories
             ? [...tempCategories.categories]
             : [];
+        isModalActive = categories.length === 0;
     });
 </script>
 
-<div class="is-inline-flex my-3 box">
-    {#if categories.length > 0}
+<RegisterCategoryModal
+    {isModalActive}
+    on:categoryRegistered={(e) => (
+        (categories = [...categories, e.detail]), (isModalActive = false)
+    )}
+/>
+<div class="my-3 box">
+    <div class="is-inline-flex">
         <div class="control {isAddingChannel && 'is-loading'}">
             <input
                 bind:value={channelId}
@@ -132,7 +140,8 @@
             </span>
             <span>Register a channel</span>
         </button>
-    {:else}
-        <RegisterCategoryModal />
-    {/if}
+    </div>
+    <div class="has-text-centered mt-2">
+        <a href="#" on:click={()=> isModalActive=true}>Add categories</a>
+    </div>
 </div>

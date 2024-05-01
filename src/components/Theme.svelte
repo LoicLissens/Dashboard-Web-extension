@@ -1,14 +1,16 @@
 <script>
     let isDark = false;
+    $: theme = isDark ? 'dark' : 'light';
     const toggleTheme = () => {
         isDark = !isDark;
-        document.body.classList.toggle("dark");
+        const  htmlElement = document.querySelector('html');
+        htmlElement.setAttribute('data-theme', theme);
     };
 </script>
 
 <button on:click={()=> toggleTheme()}>
     <span class="icon">
-        {#if isDark}
+        {#if !isDark}
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
