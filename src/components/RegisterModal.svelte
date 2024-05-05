@@ -25,7 +25,9 @@
           <div class="control">
             <input name="name" type="text"  placeholder="Name" class="input is-narrow {isDanger && 'is-danger'}"/>
           </div>
-          <input type="submit" class="button ml-2" />
+          <button class="button is-primary is-outlined has-text-grey ml-2">
+            Register Name
+          </button>
         </form>
       </div>
     </div>

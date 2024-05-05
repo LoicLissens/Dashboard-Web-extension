@@ -8,7 +8,7 @@
   import Navbar from './components/layout/Navbar.svelte';
 
   let notificationsList = [];
-  const unsubscribe = notifications.subscribe(value => {
+  notifications.subscribe(value => {
     notificationsList = value;
   });
 
