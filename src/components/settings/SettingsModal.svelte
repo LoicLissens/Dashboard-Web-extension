@@ -1,7 +1,8 @@
 <script>
     import { onMount, onDestroy } from "svelte";
     import SettingsTabs from "./SettingsTabs.svelte";
-    export let isModalActive = true;
+    import VideoSettings from "./VideoSettings.svelte";
+    export let isModalActive;
 
     let keydownHandler;
     const settings = [
@@ -28,11 +29,16 @@
 <div class="modal {isModalActive && 'is-active'}">
     <div class="modal-background blur"></div>
     <div class="modal-content">
-        <div class="box">
+        <div class="box" style="height: 70vh;">
             <SettingsTabs
                 {activeTab}
                 on:changeTab={(e) => (activeTab = e.detail)}
             />
+            {#if activeTab === "general"}
+                <h1 class="title">General</h1>
+            {:else if activeTab === "videos"}
+                <VideoSettings />
+            {/if}
         </div>
     </div>
 </div>

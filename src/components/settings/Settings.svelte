@@ -1,8 +1,9 @@
 <script>
     import SettingsModal from "./SettingsModal.svelte";
+    let isModalActive = true;
 </script>
-<SettingsModal />
-<button>
+<SettingsModal {isModalActive} />
+<button on:click={()=> isModalActive = !isModalActive}>
     <span class="icon">
         <svg
             xmlns="http://www.w3.org/2000/svg"
