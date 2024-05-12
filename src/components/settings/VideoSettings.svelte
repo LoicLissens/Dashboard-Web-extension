@@ -1,31 +1,39 @@
 <script>
     import { onMount } from "svelte";
-    import  {getFromBrowserStorage} from "../../helpers/manageStorage"
+    import  {getFromBrowserStorage, setTobrowserStorage,storageKeys} from "../../helpers/manageStorage"
+    import youtubeAPI from "../../services/youtubeAPI";
 
     let ytApiKey;
 
     onMount(() => {
-        ytApiKey = getFromBrowserStorage("ytApiKey").then((data) => {
+        getFromBrowserStorage(storageKeys.YOUTUBEAPIKEY).then((data) => {
             ytApiKey = data;
         })
     });
+    async function setApiKey(e) {
+        const apiKey = e.target.elements.key.value;
+        await setTobrowserStorage(storageKeys.YOUTUBEAPIKEY, apiKey);
+        youtubeAPI.setAPIKey(apiKey);
+        ytApiKey = apiKey;
+    }
 
 </script>
-<div class="">
+<div>
     {#if ytApiKey}
     <div class="field">
         <label class="label">Youtube API Key</label>
         <div class="control">
-            <input class="input" type="text" placeholder="Text input" value={ytApiKey} />
+            <input class="input" type="text" value={ytApiKey} disabled />
         </div>
     </div>
     {:else}
-        <div class="field">
-            <label class="label">Youtube API Key</label>
-            <div class="control">
-                <input class="input" type="text" placeholder="Text input" />
+        <form on:submit|preventDefault={(e)=>setApiKey(e)}>
+            <div class="field">
+                <label class="label">Youtube API Key</label>
+                <div class="control">
+                    <input class="input" name="key" type="text" placeholder="Add a Youtube API key" />
+                </div>
             </div>
-        </div>
+        </form>
     {/if}
-
 </div>

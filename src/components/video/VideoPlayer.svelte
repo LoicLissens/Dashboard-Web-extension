@@ -2,17 +2,12 @@
     import { onMount } from "svelte";
     import youtubeAPI from "../../services/youtubeAPI";
     export let channel;
-    // let embededVideo;
     let lastVideoId;
     const fetchLastVideo = async (uploadPlaylistId) => {
         const getItemsFromPlaylist =
             await youtubeAPI.getPlaylistItems(uploadPlaylistId);
         lastVideoId =
             getItemsFromPlaylist.data.items[0].snippet.resourceId.videoId;
-        // const getVideoPlayerInfo = await youtubeAPI.getVideoPlayer(lastVideoId);
-        // const videoUrl = getVideoPlayerInfo.data.items[0].player.embedHtml;
-        // embededVideo = videoUrl.replace('src="', 'src="https:');
-        // idVideo = getVideoPlayerInfo.data.items[0].id
     };
     onMount(() => {
         fetchLastVideo(channel.uploadPlaylistId);
@@ -34,11 +29,6 @@
             {channel.name}
         </p>
     </div>
-    <!-- <figure class="image is-16by9">
-        {#if embededVideo}{@html embededVideo}{:else}
-            <p>Load video</p>
-        {/if}
-    </figure> -->
     <figure class="image is-16by9">
         <iframe
             class="has-ratio"

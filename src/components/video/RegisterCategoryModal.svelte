@@ -3,6 +3,7 @@
     import {
         setTobrowserStorage,
         getFromBrowserStorage,
+        storageKeys
     } from "../../helpers/manageStorage";
     import { addNotification } from "../../store/store";
 
@@ -17,11 +18,11 @@
             isDanger = true;
             return;
         }
-        const stockedCatergories = await getFromBrowserStorage("categories");
-        const tempCategories = stockedCatergories.categories
-            ? [...stockedCatergories.categories]
+        const stockedCatergories = await getFromBrowserStorage(storageKeys.CATEGORIES);
+        const tempCategories = stockedCatergories
+            ? [...stockedCatergories]
             : [];
-        await setTobrowserStorage("categories", [...tempCategories, category]);
+        await setTobrowserStorage(storageKeys.CATEGORIES, [...tempCategories, category]);
         dispatch("categoryRegistered", categoryToRegister);
         isDanger = false;
         categoryToRegister = "";

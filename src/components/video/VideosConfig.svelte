@@ -4,6 +4,7 @@
     import {
         setTobrowserStorage,
         getFromBrowserStorage,
+        storageKeys
     } from "../../helpers/manageStorage";
     import { addNotification } from "../../store/store";
     import RegisterCategoryModal from "./RegisterCategoryModal.svelte";
@@ -16,7 +17,7 @@
     let isError = false;
     let isModalActive = false;
 
-    const fetchChannelInfo = async (InputChannelId, category = "Others") => {
+    const fetchChannelInfo = async (InputChannelId, category) => {
         const getIDs = youtubeAPI.getChannelIDs(InputChannelId);
         const getChannelInfo = youtubeAPI.getChannelInfo(InputChannelId);
         const data = await Promise.all([getIDs, getChannelInfo]).then(
@@ -44,10 +45,10 @@
         );
         return data;
     };
-    const storeChannelInfo = async (InputChannelId, category = "Others") => {
+    const storeChannelInfo = async (InputChannelId, category) => {
         isAddingChannel = true;
-        const stockedVideo = await getFromBrowserStorage("video");
-        const videos = stockedVideo.video ? [...stockedVideo.video] : [];
+        const stockedVideo = await getFromBrowserStorage(storageKeys.VIDEO);
+        const videos = stockedVideo ? [...stockedVideo.video] : [];
         if (videos.some((e) => e.channelId === InputChannelId)) {
             addNotification({
                 message: "Channel already stored",
@@ -63,7 +64,7 @@
                 category,
             );
             const toStore = [...videos, channelToStore];
-            await setTobrowserStorage("video", toStore);
+            await setTobrowserStorage(storageKeys.VIDEO, toStore);
             addNotification({
                 message: "Channel stored",
                 status: "success",
@@ -82,9 +83,9 @@
     };
 
     onMount(async () => {
-        const tempCategories = await getFromBrowserStorage("categories");
-        categories = tempCategories.categories
-            ? [...tempCategories.categories]
+        const tempCategories = await getFromBrowserStorage(storageKeys.CATEGORIES);
+        categories = tempCategories
+            ? [...tempCategories]
             : [];
         isModalActive = categories.length === 0;
     });

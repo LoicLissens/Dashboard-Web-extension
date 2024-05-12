@@ -13,6 +13,16 @@ export const setTobrowserStorage = (key, payload) => {
  * @param {string} key - the key to retrieve data
  * @returns {promise}
  */
-export const getFromBrowserStorage = (key) => {
-    return browser.storage.local.get(key)
+export const getFromBrowserStorage = async (key) => {
+    const prop = await browser.storage.local.get(key)
+    return prop[key]
+
+}
+export const storageKeys = {
+    CATEGORIES: 'categories',
+    THEME: 'theme',
+    VIDEO: 'video',
+    YOUTUBEAPIKEY: 'youtubeApiKey',
+    TASKS: 'tasks',
+    NAME: 'name',
 }

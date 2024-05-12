@@ -1,16 +1,32 @@
 <script>
-    let isDark = false;
-    $: theme = isDark ? 'dark' : 'light';
-    const toggleTheme = () => {
-        isDark = !isDark;
+    import { onMount } from "svelte";
+    import {getFromBrowserStorage,storageKeys,setTobrowserStorage} from "../helpers/manageStorage"
+
+    let theme;
+    const changeTheme = (theme) => {
         const  htmlElement = document.querySelector('html');
         htmlElement.setAttribute('data-theme', theme);
+    }
+    const toggleTheme = () => {
+        theme = theme === 'dark' ? 'light' : 'dark';
+        setTobrowserStorage(storageKeys.THEME, theme);
+        changeTheme(theme);
     };
+    onMount(async() => {
+        const registeredTheme = await getFromBrowserStorage(storageKeys.THEME);
+        if (registeredTheme) {
+            theme = registeredTheme;
+            changeTheme(theme);
+            return;
+        }
+        const systemtThemeIsDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        theme = systemtThemeIsDark ? 'dark' : 'light';
+    });
 </script>
 
 <button on:click={()=> toggleTheme()}>
     <span class="icon">
-        {#if !isDark}
+        {#if theme == 'dark'}
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"

@@ -5,3 +5,4 @@ White mode was forced by adding `<html lang="en" data-theme="light">` in the `in
 
 (tedious but remporary) [find channel id ](https://mixedanalytics.com/blog/find-a-youtube-channel-id/) or
 `curl -s url_of_yt_channel | grep -o 'https://www.youtube.com/channel/[^"]*' | head -n 1 | awk -F/ '{print $NF}'`
+or `source chanelid.bash`then `get_yt_channel_id "link" `

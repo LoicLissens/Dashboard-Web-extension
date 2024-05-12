@@ -2,13 +2,13 @@
   import { date } from "../store/store";
   import { greeting, msToDate } from "../helpers/time";
   import { onMount } from "svelte";
-  import browser from "webextension-polyfill";
-  import { getFromBrowserStorage } from "../helpers/manageStorage";
+  import { getFromBrowserStorage,setTobrowserStorage,storageKeys } from "../helpers/manageStorage";
   import RegisterModal from "./RegisterModal.svelte";
+
   let name;
 
   function setName(registeredName) {
-      browser.storage.local.set({ name: registeredName })
+      setTobrowserStorage(storageKeys.NAME, registeredName)
       .then(() => {
         name = registeredName;
       })
@@ -17,9 +17,9 @@
     });
   }
   onMount(() => {
-    getFromBrowserStorage("name")
+    getFromBrowserStorage(storageKeys.NAME)
       .then((data) => {
-        name = data.name;
+        name = data;
       })
       .catch((err) => {
         console.error(err);

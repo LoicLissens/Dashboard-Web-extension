@@ -2,9 +2,11 @@
   import {
     setTobrowserStorage,
     getFromBrowserStorage,
+    storageKeys
   } from "../helpers/manageStorage";
   import { onMount } from "svelte";
   import { timeStringToSeconds } from "../helpers/time";
+
   let newTask = {
     label: undefined,
     hour: undefined,
@@ -17,7 +19,7 @@
   $: disabledButton = newTask.label && newTask.hour ? false : true;
   function addTask() {
     tasks = [...tasks, newTask];
-    setTobrowserStorage("tasks", tasks).catch((err) => {
+    setTobrowserStorage(storageKeys.TASKS, tasks).catch((err) => {
       console.log(err);
     });
     newTask = {
@@ -29,19 +31,19 @@
   function removeTask(taskToDelete) {
     const newArray = tasks.filter((task) => task.label != taskToDelete);
     tasks = [...newArray];
-    setTobrowserStorage("tasks", tasks).catch((err) => {
+    setTobrowserStorage(storageKeys.TASKS, tasks).catch((err) => {
       console.log(err);
     });
   }
   function updateTask() {
-    setTobrowserStorage("tasks", tasks).catch((err) => {
+    setTobrowserStorage(storageKeys.TASKS, tasks).catch((err) => {
       console.log(err);
     });
   }
   onMount(() => {
-    getFromBrowserStorage("tasks")
+    getFromBrowserStorage(storageKeys.TASKS)
       .then((data) => {
-        tasks = data.tasks || [];
+        tasks = data || [];
       })
       .catch((err) => {
         console.error(err);
