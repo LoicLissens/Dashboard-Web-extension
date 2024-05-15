@@ -2,6 +2,8 @@
     import { onMount, onDestroy } from "svelte";
     import SettingsTabs from "./SettingsTabs.svelte";
     import VideoSettings from "./VideoSettings.svelte";
+    import GeneralSettings from "./GeneralSettings.svelte";
+
     export let isModalActive;
 
     let keydownHandler;
@@ -35,7 +37,7 @@
                 on:changeTab={(e) => (activeTab = e.detail)}
             />
             {#if activeTab === "general"}
-                <h1 class="title">General</h1>
+                <GeneralSettings/>
             {:else if activeTab === "videos"}
                 <VideoSettings />
             {/if}
