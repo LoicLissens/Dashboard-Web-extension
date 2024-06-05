@@ -1,11 +1,12 @@
 <script>
     import { onMount, onDestroy } from "svelte";
+    import {clickOutside} from "../../helpers/clickOutside"
     import SettingsTabs from "./SettingsTabs.svelte";
     import VideoSettings from "./VideoSettings.svelte";
     import GeneralSettings from "./GeneralSettings.svelte";
 
     export let isModalActive;
-
+    
     let keydownHandler;
     const settings = [
         //TODO: Change the way tab is handled is creepy right now
@@ -14,10 +15,13 @@
     ];
     let activeTab = "general";
 
+    function closeModal(){
+        isModalActive = false;
+    }
     onMount(() => {
         keydownHandler = function (event) {
             if (event.key === "Escape") {
-                isModalActive = false;
+                closeModal()
             }
         };
 
@@ -30,7 +34,7 @@
 
 <div class="modal {isModalActive && 'is-active'}">
     <div class="modal-background blur"></div>
-    <div class="modal-content">
+    <div class="modal-content" use:clickOutside on:click_outside={closeModal}>
         <div class="box" style="height: 70vh;">
             <SettingsTabs
                 {activeTab}

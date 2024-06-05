@@ -30,7 +30,7 @@
     };
 </script>
 
-<div>  <!-- TODO Refactor if/else, It suck this way I think and add click outside -->
+<div>  <!-- TODO Refactor if/else, It suck this way I think-->
     {#if ytApiKey}
     <form on:submit|preventDefault={(e) => setApiKey(e)}>
         <div class="is-flex">

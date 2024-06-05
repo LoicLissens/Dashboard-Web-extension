@@ -17,6 +17,9 @@
     let isError = false;
     let isModalActive = false;
 
+    function closeModal() {
+        isModalActive = false;
+    }
     const fetchChannelInfo = async (InputChannelId, category) => {
         const getIDs = youtubeAPI.getChannelIDs(InputChannelId);
         const getChannelInfo = youtubeAPI.getChannelInfo(InputChannelId);
@@ -94,8 +97,10 @@
 <RegisterCategoryModal
     {isModalActive}
     on:categoryRegistered={(e) => (
-        (categories = [...categories, e.detail]), (isModalActive = false)
+        (categories = [...categories, e.detail]), (closeModal())
     )}
+    on:closeModal={closeModal}
+
 />
 <div class="my-3 box">
     <h2 class="has-text-centered">

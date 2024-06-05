@@ -6,13 +6,16 @@
         storageKeys
     } from "../../helpers/manageStorage";
     import { addNotification } from "../../store/store";
+    import {clickOutside} from "../../helpers/clickOutside";
 
-    export let isModalActive = true;
-
-    const dispatch = createEventDispatcher();
+    export let isModalActive;
     let categoryToRegister = "";
     let isDanger = false;
 
+    const dispatch = createEventDispatcher();
+    function closeModal() {
+        dispatch("closeModal")
+    }
     const storeCatergory = async (category) => {
         if (!category) {
             isDanger = true;
@@ -35,7 +38,7 @@
 
 <div class="modal {isModalActive && 'is-active'}">
     <div class="modal-background blur"></div>
-    <div class="modal-content box">
+    <div class="modal-content box"  use:clickOutside on:click_outside={closeModal}>
         <h1
             class="title has-text-weight-semibold has-text-centered has-text-grey"
         >
