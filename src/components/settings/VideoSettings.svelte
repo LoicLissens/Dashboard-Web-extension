@@ -30,12 +30,12 @@
     };
 </script>
 
-<div>  <!-- TODO Refactor if/else, It suck this way I think-->
+<div>  <!-- TODO Refactor if/else, It suck this way I think AND MAKE A  COMPONENT-->
+    <h4 class="title is-4 title has-text-grey has-text-centere">Youtube API Key</h4>
     {#if ytApiKey}
     <form on:submit|preventDefault={(e) => setApiKey(e)}>
         <div class="is-flex">
             <div class="field">
-                <label class="label">Youtube API Key</label>
                 <div class="control has-icons-right">
                     <input
                         class="input"
@@ -108,7 +108,6 @@
     {:else}
         <form on:submit|preventDefault={(e) => setApiKey(e)}>
             <div class="field">
-                <label class="label">Youtube API Key</label>
                 <div class="control">
                     <input
                         class="input"
@@ -120,4 +119,6 @@
             </div>
         </form>
     {/if}
+    <!--Catergory part-->
+    <div class=""></div>
 </div>

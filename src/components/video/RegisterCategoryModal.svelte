@@ -34,6 +34,12 @@
             status: "success",
         });
     };
+    const onEnterPress = async (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Prevent form submission
+            await storeCatergory(categoryToRegister);
+        }
+    };
 </script>
 
 <div class="modal {isModalActive && 'is-active'}">
@@ -51,6 +57,7 @@
                     placeholder="Category"
                     type="text"
                     class="input {isDanger && 'is-danger'}"
+                    on:keydown={onEnterPress}
                 />
             </div>
             <button

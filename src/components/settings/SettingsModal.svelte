@@ -1,12 +1,14 @@
 <script>
     import { onMount, onDestroy } from "svelte";
+    import { createEventDispatcher } from 'svelte';
     import {clickOutside} from "../../helpers/clickOutside"
     import SettingsTabs from "./SettingsTabs.svelte";
     import VideoSettings from "./VideoSettings.svelte";
     import GeneralSettings from "./GeneralSettings.svelte";
 
     export let isModalActive;
-    
+    const dispatch = createEventDispatcher();
+
     let keydownHandler;
     const settings = [
         //TODO: Change the way tab is handled is creepy right now
@@ -16,7 +18,7 @@
     let activeTab = "general";
 
     function closeModal(){
-        isModalActive = false;
+       dispatch("closeModal")
     }
     onMount(() => {
         keydownHandler = function (event) {
