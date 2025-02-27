@@ -9,6 +9,8 @@
     import {clickOutside} from "../../helpers/clickOutside";
 
     export let isModalActive;
+    export let existingCategories;
+
     let categoryToRegister = "";
     let isDanger = false;
 
@@ -40,6 +42,15 @@
             await storeCatergory(categoryToRegister);
         }
     };
+    const deleteCategory = async (category) => {
+        const tempCategories = existingCategories.filter((e) => e !== category);
+        await setTobrowserStorage(storageKeys.CATEGORIES, tempCategories);
+        existingCategories = tempCategories;
+        addNotification({
+            message: `Categorie ${category} deleted !`,
+            status: "success",
+        })
+    };
 </script>
 
 <div class="modal {isModalActive && 'is-active'}">
@@ -66,5 +77,15 @@
                 >Register Category</button
             >
         </div>
+        <div >
+            <h2>Existing categories : </h2>
+            <div>
+                {#each existingCategories as category}
+                    <span class="tag mr-1">{category}<button class="delete is-small" on:click={deleteCategory(category)}></button></span>
+                {/each}
+            </div>
+
+        </div>
     </div>
 </div>
+

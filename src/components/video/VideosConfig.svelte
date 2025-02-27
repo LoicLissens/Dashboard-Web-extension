@@ -95,7 +95,8 @@
 </script>
 
 <RegisterCategoryModal
-    {isModalActive}
+    isModalActive={isModalActive}
+    existingCategories={categories}
     on:categoryRegistered={(e) => (
         (categories = [...categories, e.detail]), (closeModal())
     )}

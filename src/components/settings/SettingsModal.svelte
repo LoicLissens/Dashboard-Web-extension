@@ -11,7 +11,6 @@
 
     let keydownHandler;
     const settings = [
-        //TODO: Change the way tab is handled is creepy right now
         { label: "Home", state: "home" },
         { label: "Videos", state: "videos" },
     ];

@@ -20,7 +20,7 @@
                 const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                 const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&timezone=${tz}&current=temperature_2m&daily=temperature_2m_max,temperature_2m_min&forecast_days=1`;
                 axios.get(url).then((r) => {
-                    //TODO Cash the meteo do avoir fetching all the time
+                    //TODO Cache the meteo do avoir fetching all the time
                     let data = r.data;
                     currTemp = data.current.temperature_2m;
                     currUnit = data.current_units.temperature_2m;
