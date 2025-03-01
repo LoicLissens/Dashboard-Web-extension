@@ -1,14 +1,14 @@
 <script>
-  import { notifications } from './store/store';
+  import { notifications } from "./store/store";
 
   import General from "./views/Home.svelte";
   import Sidebar from "./components/layout/Sidebar.svelte";
   import Videos from "./views/Videos.svelte";
-  import Notification from './components/Notification.svelte';
-  import Navbar from './components/layout/Navbar.svelte';
+  import Notification from "./components/Notification.svelte";
+  import Navbar from "./components/layout/Navbar.svelte";
 
   let notificationsList = [];
-  notifications.subscribe(value => {
+  notifications.subscribe((value) => {
     notificationsList = value;
   });
 
@@ -26,7 +26,7 @@
   {/each}
   <Sidebar {pages} on:changePage={(e) => (state = e.detail)} />
   {#if state === "home"}
-    <General  />
+    <General />
   {:else if state === "videos"}
     <Videos />
   {/if}

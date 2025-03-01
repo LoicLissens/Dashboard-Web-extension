@@ -5,7 +5,7 @@
 
     export let channels
     export let category
-    export let expanded = false
+    let expanded = false
 </script>
 
 <div class="is-flex has-text-grey">

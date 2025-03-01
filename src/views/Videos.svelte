@@ -38,7 +38,7 @@
   {:else}
     <p>API Key not provided
       <Tooltip
-            tooltipText="Api key cn be added in the settings"
+            tooltipText="API key can be added in the settings"
             ><span class="icon is-clickable">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"

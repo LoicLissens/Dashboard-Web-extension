@@ -56,21 +56,5 @@
                 </span>Videos</a>
         </li>
     </ul>
-    <span class="key">esc</span>
+    <kbd class="key">esc</kbd>
 </div>
-<style>
-    .key {
-        display: inline-block;
-        padding: 0.2em 0.6em;
-        font-size: 0.8em;
-        font-family: 'Courier New', Courier, monospace;
-        border: 1px solid #ddd;
-        border-radius: 3px;
-        box-shadow: 0 1px 0 rgba(0,0,0,0.2),
-                    0 2px 0 rgba(255,255,255,0.7);
-        background-color: #f7f7f7;
-        color: #333;
-        line-height: 1;
-        height: 1.6em;
-    }
-</style>

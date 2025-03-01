@@ -16,7 +16,7 @@
     let isAddingChannel = false;
     let isError = false;
     let isModalActive = false;
-
+    const tooltipText = "curl -s &lt;b&gt;bold URL&lt;/b&gt; | grep -o &#39;https://www.youtube.com/channel/[^&quot;]*&#39; | head -n 1 | awk -F/ &#39;&#123;print $NF&#125;&#39;"
     function closeModal() {
         isModalActive = false;
     }
@@ -39,6 +39,7 @@
                         defaultAvatrUrl: info.thumbnails.default.url,
                         mediumAvatrUrl: info.thumbnails.medium.url,
                         highAvatrUrl: info.thumbnails.high.url,
+                        nbVideoToFecth: 1
                     };
                     return fullChannelObj;
                 } catch (e) {
@@ -51,7 +52,8 @@
     const storeChannelInfo = async (InputChannelId, category) => {
         isAddingChannel = true;
         const stockedVideo = await getFromBrowserStorage(storageKeys.VIDEO);
-        const videos = stockedVideo ? [...stockedVideo.video] : [];
+        //TODO: pass stocked video as a props
+        const videos = stockedVideo || [];
         if (videos.some((e) => e.channelId === InputChannelId)) {
             addNotification({
                 message: "Channel already stored",
@@ -106,7 +108,7 @@
 <div class="my-3 box">
     <h2 class="has-text-centered">
         Enter a channel ID get lasts video from the channel <Tooltip
-            tooltipText="The channel ID can be obtained in the settings"
+            tooltipText={tooltipText}
             ><span class="icon is-clickable">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -170,6 +172,6 @@
         </button>
     </div>
     <div class="has-text-centered mt-2">
-        <a href="#" on:click={() => (isModalActive = true)}>Add categories</a>
+        <button class="button is-link is-outlined" on:click={() => (isModalActive = true)}>Add categories</button>
     </div>
 </div>

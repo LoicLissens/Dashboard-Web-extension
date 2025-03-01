@@ -3,15 +3,14 @@
     import youtubeAPI from "../../services/youtubeAPI";
     export let channel;
     let lastVideoId;
-    const fetchLastVideo = async (uploadPlaylistId) => {
+    let videosID = [];
+    async function fetchLastVideo(uploadPlaylistId) {
         const getItemsFromPlaylist =
             await youtubeAPI.getPlaylistItems(uploadPlaylistId);
         lastVideoId =
             getItemsFromPlaylist.data.items[0].snippet.resourceId.videoId;
-    };
-    onMount(() => {
-        fetchLastVideo(channel.uploadPlaylistId);
-    });
+        videosID.push(lastVideoId);
+    }
 </script>
 
 <div class="box channelbox block">
@@ -29,14 +28,18 @@
             {channel.name}
         </p>
     </div>
-    <figure class="image is-16by9">
-        <iframe
-            class="has-ratio"
-            src="https://www.youtube.com/embed/{lastVideoId}"
-            frameborder="0"
-            allowfullscreen
-        ></iframe>
-    </figure>
+    {#await fetchLastVideo(channel.uploadPlaylistId)}
+        <p>Loading...</p>
+    {:then}
+        {#each videosID as id}
+            <figure class="image is-16by9">
+                <iframe
+                    class="has-ratio"
+                    src="https://www.youtube.com/embed/{id}"
+                    frameborder="0"
+                    allowfullscreen
+                ></iframe>
+            </figure>
+        {/each}
+    {/await}
 </div>
-
-

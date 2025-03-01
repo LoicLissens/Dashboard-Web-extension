@@ -1,6 +1,6 @@
 <script>
     import SettingsModal from "./SettingsModal.svelte";
-    let isModalActive = true;
+    let isModalActive = false;
     const setModal =  () => {
         isModalActive = true;
     }

@@ -1,4 +1,5 @@
 <script>
+    import { onMount, onDestroy } from "svelte";
     import { createEventDispatcher } from "svelte";
     import {
         setTobrowserStorage,
@@ -11,6 +12,7 @@
     export let isModalActive;
     export let existingCategories;
 
+    let keydownHandler;
     let categoryToRegister = "";
     let isDanger = false;
 
@@ -18,6 +20,19 @@
     function closeModal() {
         dispatch("closeModal")
     }
+    //TODO Create a component for esc KBD with the logic to close modal inside
+    onMount(() => {
+        keydownHandler = function (event) {
+            if (event.key === "Escape") {
+                closeModal()
+            }
+        };
+
+        window.addEventListener("keydown", keydownHandler);
+    });
+    onDestroy(() => {
+        window.removeEventListener("keydown", keydownHandler);
+    });
     const storeCatergory = async (category) => {
         if (!category) {
             isDanger = true;
@@ -56,11 +71,14 @@
 <div class="modal {isModalActive && 'is-active'}">
     <div class="modal-background blur"></div>
     <div class="modal-content box"  use:clickOutside on:click_outside={closeModal}>
-        <h1
+        <div class="is-flex">
+            <h1
             class="title has-text-weight-semibold has-text-centered has-text-grey"
         >
             Register a video category
         </h1>
+        <kbd class="key is-align-content-end">esc</kbd>
+        </div>
         <div class="is-flex is-justify-content-center">
             <div class="px-2">
                 <input
