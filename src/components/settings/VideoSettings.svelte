@@ -24,9 +24,7 @@
             getFromBrowserStorage(storageKeys.VIDEO).then((data) => {
                 channels = data;
             }),
-        ]).then(() => {
-            console.log(channels);
-        });
+        ])
     });
     async function setApiKey(e) {
         const apiKey = e.target.elements.key.value;
@@ -35,6 +33,12 @@
         ytApiKey = apiKey;
         isDisabled = true;
         showKey = false;
+    }
+    async function setNBVideoToRetrieve(e,channelId) {
+        const nbVideo = e.target.value;
+        const index = channels.findIndex((channel)=>channel.channelId === channelId);
+        channels[index].nbVideoToRetrieve = nbVideo;
+        await setTobrowserStorage(storageKeys.VIDEO, channels);
     }
     const editApiKey = () => {
         isDisabled = !isDisabled;
@@ -165,7 +169,7 @@
                     {#each channels as channel}
                         <div>
                             <div>Name : {channel.name}</div>
-                            <div>Number of video to fetch :  <input type="number" min="1" max="5" value={channel.nbVideoToFecth}/></div>
+                            <div>Number of video to retrieve :  <input type="number" min="1" max="5" value={channel.nbVideoToRetrieve} on:change={(e)=>setNBVideoToRetrieve(e,channel.channelId)}/></div>
                         </div>
                     {/each}
                 </div>

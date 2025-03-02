@@ -2,14 +2,16 @@
     import { onMount } from "svelte";
     import youtubeAPI from "../../services/youtubeAPI";
     export let channel;
-    let lastVideoId;
-    let videosID = [];
+    let videosIds = [];
     async function fetchLastVideo(uploadPlaylistId) {
         const getItemsFromPlaylist =
             await youtubeAPI.getPlaylistItems(uploadPlaylistId);
-        lastVideoId =
-            getItemsFromPlaylist.data.items[0].snippet.resourceId.videoId;
-        videosID.push(lastVideoId);
+        for (let i = 0; i <= channel.nbVideoToRetrieve -1; i++) {
+            console.log("pass");
+            let videoId =
+                getItemsFromPlaylist.data.items[i].snippet.resourceId.videoId;
+            videosIds.push(videoId);
+        }
     }
 </script>
 
@@ -31,7 +33,7 @@
     {#await fetchLastVideo(channel.uploadPlaylistId)}
         <p>Loading...</p>
     {:then}
-        {#each videosID as id}
+        {#each videosIds as id}
             <figure class="image is-16by9">
                 <iframe
                     class="has-ratio"
