@@ -1,9 +1,9 @@
-<script>
+<script lang="ts">
     import youtubeAPI from "../../services/youtubeAPI";
     import {
         setVideosToStorage,
         getVideosFromStorage,
-    } from "../../helpers/manageStorage";
+    } from "../../helpers/manageStorage.ts";
     import { addNotification } from "../../store/store";
 
 

@@ -1,11 +1,11 @@
-<script>
+<script lang="ts">
     import { onMount, onDestroy } from "svelte";
     import { createEventDispatcher } from "svelte";
     import {
         setTobrowserStorage,
         getFromBrowserStorage,
         storageKeys
-    } from "../../helpers/manageStorage";
+    } from "../../helpers/manageStorage.ts";
     import { addNotification } from "../../store/store";
     import {clickOutside} from "../../helpers/clickOutside";
 

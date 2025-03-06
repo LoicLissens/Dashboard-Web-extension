@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import browser from "webextension-polyfill";
     import {clearStorage,getAllFromStorage} from "../../helpers/manageStorage"
 

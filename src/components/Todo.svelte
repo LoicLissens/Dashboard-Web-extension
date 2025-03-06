@@ -1,9 +1,9 @@
-<script>
+<script lang="ts">
   import {
     setTobrowserStorage,
     getFromBrowserStorage,
     storageKeys
-  } from "../helpers/manageStorage";
+  } from "../helpers/manageStorage.ts";
   import { onMount } from "svelte";
   import { timeStringToSeconds } from "../helpers/time";
 

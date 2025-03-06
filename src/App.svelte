@@ -1,5 +1,5 @@
-<script>
-  import { notifications } from "./store/store";
+<script lang="ts">
+  import { notifications } from "./store/store.ts";
 
   import General from "./views/Home.svelte";
   import Sidebar from "./components/layout/Sidebar.svelte";

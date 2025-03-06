@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { fade } from 'svelte/transition';
   import youtubeAPI from "../services/youtubeAPI";
   import { getVideosFromStorage,storageKeys,getFromBrowserStorage } from "../helpers/manageStorage";

@@ -7,6 +7,12 @@ export const storageKeys = {
     TASKS: 'tasks',
     NAME: 'name',
 }
+enum Direction {
+    Up = "UP",
+    Down = "DOWN",
+    Left = "LEFT",
+    Right = "RIGHT",
+  }
 /**
  * A reusable function to store/update to local browser storage
  * @param {string} key - the key where is store the data

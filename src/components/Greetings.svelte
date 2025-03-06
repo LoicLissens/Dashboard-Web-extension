@@ -1,4 +1,4 @@
-<script>
+<script lang=ts>
   import { date } from "../store/store";
   import { greeting, msToDate } from "../helpers/time";
   import { onMount } from "svelte";

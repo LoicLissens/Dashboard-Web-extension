@@ -1,11 +1,11 @@
-<script>
+<script lang="ts">
     import { onMount } from "svelte";
     import youtubeAPI from "../../services/youtubeAPI";
     import {
         setTobrowserStorage,
         getFromBrowserStorage,
         storageKeys
-    } from "../../helpers/manageStorage";
+    } from "../../helpers/manageStorage.ts";
     import { addNotification } from "../../store/store";
     import RegisterCategoryModal from "./RegisterCategoryModal.svelte";
     import Tooltip from "../utils/Tooltip.svelte";

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import { onMount } from "svelte";
     import {getFromBrowserStorage,storageKeys,setTobrowserStorage} from "../helpers/manageStorage"
 
