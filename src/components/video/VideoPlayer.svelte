@@ -1,16 +1,42 @@
 <script>
-    import { onMount } from "svelte";
     import youtubeAPI from "../../services/youtubeAPI";
+    import {
+        setVideosToStorage,
+        getVideosFromStorage,
+    } from "../../helpers/manageStorage";
+    import { addNotification } from "../../store/store";
+
+
     export let channel;
-    let videosIds = [];
+    let videos = [];
+    let hiddenVideos = channel.hiddenVideos.map((v) => v.id);
     async function fetchLastVideo(uploadPlaylistId) {
         const getItemsFromPlaylist =
             await youtubeAPI.getPlaylistItems(uploadPlaylistId);
-        for (let i = 0; i <= channel.nbVideoToRetrieve -1; i++) {
-            console.log("pass");
-            let videoId =
-                getItemsFromPlaylist.data.items[i].snippet.resourceId.videoId;
-            videosIds.push(videoId);
+        for (let i = 0; i <= channel.nbVideoToRetrieve - 1; i++) {
+            let video = {
+                title: getItemsFromPlaylist.data.items[i].snippet.title,
+                thumbnail:
+                    getItemsFromPlaylist.data.items[i].snippet.thumbnails.medium
+                        .url,
+                id: getItemsFromPlaylist.data.items[i].snippet.resourceId
+                    .videoId,
+            };
+            videos.push(video);
+        }
+    }
+
+    async function hideVideo(video) {
+        if (!hiddenVideos.includes(video.id)) {
+            const channels = await getVideosFromStorage();
+            const channelIndex = channels.findIndex((c) => c.id === channel.id);
+            channels[channelIndex].hiddenVideos.push(video);
+            await setVideosToStorage(channels);
+            hiddenVideos = channels[channelIndex].hiddenVideos.map((v) => v.id);
+            addNotification({
+            message: `The video ${video.title} won't be show again.`,
+            status: "success",
+        })
         }
     }
 </script>
@@ -33,15 +59,24 @@
     {#await fetchLastVideo(channel.uploadPlaylistId)}
         <p>Loading...</p>
     {:then}
-        {#each videosIds as id}
-            <figure class="image is-16by9">
-                <iframe
-                    class="has-ratio"
-                    src="https://www.youtube.com/embed/{id}"
-                    frameborder="0"
-                    allowfullscreen
-                ></iframe>
-            </figure>
+        {#each videos as video}
+            {#if !hiddenVideos.includes(video.id)}
+                <figure class="image is-16by9">
+                    <iframe
+                        class="has-ratio"
+                        src="https://www.youtube.com/embed/{video.id}"
+                        frameborder="0"
+                        allowfullscreen
+                    ></iframe>
+                </figure>
+                <label class="checkbox">
+                    <input
+                        type="checkbox"
+                        on:change={(e) => hideVideo(video)}
+                    />
+                    Hide this video
+                </label>
+            {/if}
         {/each}
     {/await}
 </div>

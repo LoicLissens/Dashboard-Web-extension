@@ -1,4 +1,12 @@
 import browser from "webextension-polyfill";
+export const storageKeys = {
+    CATEGORIES: 'categories',
+    THEME: 'theme',
+    VIDEO: 'video',
+    YOUTUBEAPIKEY: 'youtubeApiKey',
+    TASKS: 'tasks',
+    NAME: 'name',
+}
 /**
  * A reusable function to store/update to local browser storage
  * @param {string} key - the key where is store the data
@@ -18,11 +26,23 @@ export const getFromBrowserStorage = async (key) => {
     return prop[key]
 
 }
-export const storageKeys = {
-    CATEGORIES: 'categories',
-    THEME: 'theme',
-    VIDEO: 'video',
-    YOUTUBEAPIKEY: 'youtubeApiKey',
-    TASKS: 'tasks',
-    NAME: 'name',
+export const clearStorage = async () => {
+    await browser.storage.local.clear()
+}
+//Getters
+export const getAllFromStorage = async () => {
+    await browser.storage.local.get()
+}
+export const getVideosFromStorage = async () => {
+    return await getFromBrowserStorage(storageKeys.VIDEO)
+}
+export const getCategoriesFromStorage = async () => {
+    return await getFromBrowserStorage(storageKeys.CATEGORIES)
+}
+//setter
+export const setVideosToStorage = async (payload) => {
+    await setTobrowserStorage(storageKeys.VIDEO, payload)
+}
+export const setCategoriesToStorage = async (payload) => {
+    await setTobrowserStorage(storageKeys.CATEGORIES, payload)
 }

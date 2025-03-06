@@ -14,7 +14,7 @@
     onMount(() => {
         setTimeout(() => {
             removeNotification(notification.id);
-        }, 5000);
+        }, 3000);
     });
 </script>
 

@@ -1,10 +1,11 @@
 <script>
     import browser from "webextension-polyfill";
+    import {clearStorage,getAllFromStorage} from "../../helpers/manageStorage"
 
     //TODO add export/import validator with Zod
     // See this https://www.30secondsofcode.org/js/s/json-to-file/#:~:text=Save%20a%20JSON%20object%20to%20a%20file%20in%20the%20browser,event%20to%20download%20the%20file.
     const saveJsonConfig = async () => {
-        const config = await browser.storage.local.get()
+        const config = await getAllFromStorage()
         const filename = "config";
         const blob = new Blob([JSON.stringify(config, null, 2)], {
             type: "application/json",
@@ -17,7 +18,7 @@
         URL.revokeObjectURL(url);
     };
     const clearConfig =  async () => {
-        await browser.storage.local.clear()
+        await clearStorage()
     }
 </script>
 

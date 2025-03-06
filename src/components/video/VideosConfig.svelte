@@ -39,7 +39,8 @@
                         defaultAvatrUrl: info.thumbnails.default.url,
                         mediumAvatrUrl: info.thumbnails.medium.url,
                         highAvatrUrl: info.thumbnails.high.url,
-                        nbVideoToRetrieve: 1
+                        nbVideoToRetrieve: 1,
+                        hiddenVideos: [],
                     };
                     return fullChannelObj;
                 } catch (e) {

@@ -24,8 +24,9 @@
             getFromBrowserStorage(storageKeys.VIDEO).then((data) => {
                 channels = data;
             }),
-        ])
+        ]);
     });
+
     async function setApiKey(e) {
         const apiKey = e.target.elements.key.value;
         await setTobrowserStorage(storageKeys.YOUTUBEAPIKEY, apiKey);
@@ -34,10 +35,21 @@
         isDisabled = true;
         showKey = false;
     }
-    async function setNBVideoToRetrieve(e,channelId) {
+
+    async function setNBVideoToRetrieve(e, channelId) {
         const nbVideo = e.target.value;
-        const index = channels.findIndex((channel)=>channel.channelId === channelId);
+        const index = channels.findIndex(
+            (channel) => channel.channelId === channelId,
+        );
         channels[index].nbVideoToRetrieve = nbVideo;
+        await setTobrowserStorage(storageKeys.VIDEO, channels);
+    }
+    async function deleteChannel(channelId) {
+        const index = channels.findIndex(
+            (channel) => channel.channelId === channelId
+        );
+        channels.splice(index, 1)
+        channels = channels
         await setTobrowserStorage(storageKeys.VIDEO, channels);
     }
     const editApiKey = () => {
@@ -167,10 +179,29 @@
             {#if channels}
                 <div>
                     {#each channels as channel}
-                        <div>
-                            <div>Name : {channel.name}</div>
-                            <div>Number of video to retrieve :  <input type="number" min="1" max="5" value={channel.nbVideoToRetrieve} on:change={(e)=>setNBVideoToRetrieve(e,channel.channelId)}/></div>
-                        </div>
+                            <div>
+                                Name : {channel.name}
+                                <button class="delete is-small" on:click={deleteChannel(channel.channelId)}></button>
+                            </div>
+                            <div>
+                                Number of video to retrieve : <input
+                                    type="number"
+                                    min="1"
+                                    max="5"
+                                    value={channel.nbVideoToRetrieve}
+                                    on:change={(e) =>
+                                        setNBVideoToRetrieve(
+                                            e,
+                                            channel.channelId,
+                                        )}
+                                />
+                            </div>
+                            <div >
+                                Hidden videos :
+                                {#each channel.hiddenVideos as video}
+                                        {video.title}
+                                {/each}
+                            </div>
                     {/each}
                 </div>
             {/if}
