@@ -185,7 +185,7 @@
                             </div>
                             <div>
                                 Number of video to retrieve : <input
-                                    type="number"
+                                     type="number"
                                     min="1"
                                     max="5"
                                     value={channel.nbVideoToRetrieve}
@@ -199,7 +199,7 @@
                             <div >
                                 Hidden videos :
                                 {#each channel.hiddenVideos as video}
-                                        {video.title}
+                                        {video.title} <button class="delete is-small"></button>
                                 {/each}
                             </div>
                     {/each}

@@ -27,6 +27,8 @@
     }
 
     async function hideVideo(video) {
+        //TODO: Can be done with an event as channel are already fetched two components ahead
+        // but I don't want to re-render all the component just for this
         if (!hiddenVideos.includes(video.id)) {
             const channels = await getVideosFromStorage();
             const channelIndex = channels.findIndex((c) => c.id === channel.id);
