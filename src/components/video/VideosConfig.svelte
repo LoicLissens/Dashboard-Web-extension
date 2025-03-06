@@ -16,7 +16,7 @@
     let isAddingChannel = false;
     let isError = false;
     let isModalActive = false;
-    const tooltipText = "curl -s &lt;b&gt;bold URL&lt;/b&gt; | grep -o &#39;https://www.youtube.com/channel/[^&quot;]*&#39; | head -n 1 | awk -F/ &#39;&#123;print $NF&#125;&#39;"
+    const tooltipText = "WIP :  How to get a channel ID";
     function closeModal() {
         isModalActive = false;
     }

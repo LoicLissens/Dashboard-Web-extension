@@ -52,6 +52,18 @@
         channels = channels
         await setTobrowserStorage(storageKeys.VIDEO, channels);
     }
+    async function deleteHiddenVideo(videoId, channelId) {
+        const index = channels.findIndex(
+            (channel) => channel.channelId === channelId
+        );
+        const hiddenVideos = channels[index].hiddenVideos;
+        const videoIndex = hiddenVideos.findIndex(
+            (video) => video.id === videoId
+        );
+        hiddenVideos.splice(videoIndex, 1);
+        channels[index].hiddenVideos = hiddenVideos;
+        await setTobrowserStorage(storageKeys.VIDEO, channels);
+    }
     const editApiKey = () => {
         isDisabled = !isDisabled;
         showKey = isDisabled ? false : true;
@@ -181,7 +193,7 @@
                     {#each channels as channel}
                             <div>
                                 Name : {channel.name}
-                                <button class="delete is-small" on:click={deleteChannel(channel.channelId)}></button>
+                                <button class="delete" on:click={deleteChannel(channel.channelId)}></button>
                             </div>
                             <div>
                                 Number of video to retrieve : <input
@@ -199,7 +211,7 @@
                             <div >
                                 Hidden videos :
                                 {#each channel.hiddenVideos as video}
-                                        {video.title} <button class="delete is-small"></button>
+                                        {video.title} <button class="delete" on:click={()=>deleteHiddenVideo(video.id,channel.channelId)}></button>
                                 {/each}
                             </div>
                     {/each}
