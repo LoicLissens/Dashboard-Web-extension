@@ -1,25 +1,21 @@
 <script lang="ts">
   import { fade } from 'svelte/transition';
   import youtubeAPI from "../services/youtubeAPI";
-  import { getVideosFromStorage,storageKeys,getFromBrowserStorage } from "../helpers/manageStorage";
+  import { getVideosFromStorage,StorageKeys,getFromBrowserStorage,getCategoriesFromStorage } from "../helpers/manageStorage";
   import { onMount } from "svelte";
   import VideosConfig from "../components/video/VideosConfig.svelte";
   import CategoryVideos from "../components/video/CategoryVideos.svelte";
   import Tooltip from "../components/utils/Tooltip.svelte";
-
-
 
   let channels = [];
   let categories = [];
   let apiProvided = false;
 
   onMount(async () => {
-    const fetchedChannels = await getVideosFromStorage()
-    channels = fetchedChannels ? [...fetchedChannels] : [];
+    channels = await getVideosFromStorage()
     channels.sort((a, b) => a.category.localeCompare(b.category));
-    const fetchedCategories =  await getFromBrowserStorage(storageKeys.CATEGORIES)
-    categories = fetchedCategories ? [...fetchedCategories] : [];
-    const apiKey = await getFromBrowserStorage(storageKeys.YOUTUBEAPIKEY);
+    categories = await getCategoriesFromStorage()
+    const apiKey = await getFromBrowserStorage(StorageKeys.YOUTUBEAPIKEY);
     if(apiKey){
       apiProvided = true;
       youtubeAPI.setAPIKey(apiKey);

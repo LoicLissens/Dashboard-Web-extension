@@ -1,4 +1,4 @@
-export const greeting = (timeStamp) => {
+export const greeting = (timeStamp:number) => {
     const hours = new Date(timeStamp).getHours();
     let greeting;
     if (hours >= 5 && hours < 12) greeting = "Good morning";

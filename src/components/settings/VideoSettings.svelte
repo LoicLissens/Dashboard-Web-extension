@@ -3,7 +3,7 @@
     import {
         getFromBrowserStorage,
         setTobrowserStorage,
-        storageKeys,
+        StorageKeys,
     } from "../../helpers/manageStorage";
     import youtubeAPI from "../../services/youtubeAPI";
 
@@ -15,13 +15,13 @@
 
     onMount(() => {
         Promise.all([
-            getFromBrowserStorage(storageKeys.YOUTUBEAPIKEY).then((data) => {
+            getFromBrowserStorage(StorageKeys.YOUTUBEAPIKEY).then((data) => {
                 ytApiKey = data;
             }),
-            getFromBrowserStorage(storageKeys.CATEGORIES).then((data) => {
+            getFromBrowserStorage(StorageKeys.CATEGORIES).then((data) => {
                 categories = data;
             }),
-            getFromBrowserStorage(storageKeys.VIDEO).then((data) => {
+            getFromBrowserStorage(StorageKeys.VIDEO).then((data) => {
                 channels = data;
             }),
         ]);
@@ -29,7 +29,7 @@
 
     async function setApiKey(e) {
         const apiKey = e.target.elements.key.value;
-        await setTobrowserStorage(storageKeys.YOUTUBEAPIKEY, apiKey);
+        await setTobrowserStorage(StorageKeys.YOUTUBEAPIKEY, apiKey);
         youtubeAPI.setAPIKey(apiKey);
         ytApiKey = apiKey;
         isDisabled = true;
@@ -42,7 +42,7 @@
             (channel) => channel.channelId === channelId,
         );
         channels[index].nbVideoToRetrieve = nbVideo;
-        await setTobrowserStorage(storageKeys.VIDEO, channels);
+        await setTobrowserStorage(StorageKeys.VIDEO, channels);
     }
     async function deleteChannel(channelId) {
         const index = channels.findIndex(
@@ -50,7 +50,7 @@
         );
         channels.splice(index, 1)
         channels = channels
-        await setTobrowserStorage(storageKeys.VIDEO, channels);
+        await setTobrowserStorage(StorageKeys.VIDEO, channels);
     }
     async function deleteHiddenVideo(videoId, channelId) {
         const index = channels.findIndex(
@@ -62,7 +62,7 @@
         );
         hiddenVideos.splice(videoIndex, 1);
         channels[index].hiddenVideos = hiddenVideos;
-        await setTobrowserStorage(storageKeys.VIDEO, channels);
+        await setTobrowserStorage(StorageKeys.VIDEO, channels);
     }
     const editApiKey = () => {
         isDisabled = !isDisabled;

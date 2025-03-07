@@ -4,7 +4,7 @@
     import {
         setTobrowserStorage,
         getFromBrowserStorage,
-        storageKeys
+        StorageKeys
     } from "../../helpers/manageStorage.ts";
     import { addNotification } from "../../store/store";
     import {clickOutside} from "../../helpers/clickOutside";
@@ -38,11 +38,11 @@
             isDanger = true;
             return;
         }
-        const stockedCatergories = await getFromBrowserStorage(storageKeys.CATEGORIES);
+        const stockedCatergories = await getFromBrowserStorage(StorageKeys.CATEGORIES);
         const tempCategories = stockedCatergories
             ? [...stockedCatergories]
             : [];
-        await setTobrowserStorage(storageKeys.CATEGORIES, [...tempCategories, category]);
+        await setTobrowserStorage(StorageKeys.CATEGORIES, [...tempCategories, category]);
         dispatch("categoryRegistered", categoryToRegister);
         isDanger = false;
         categoryToRegister = "";
@@ -59,7 +59,7 @@
     };
     const deleteCategory = async (category) => {
         const tempCategories = existingCategories.filter((e) => e !== category);
-        await setTobrowserStorage(storageKeys.CATEGORIES, tempCategories);
+        await setTobrowserStorage(StorageKeys.CATEGORIES, tempCategories);
         existingCategories = tempCategories;
         addNotification({
             message: `Categorie ${category} deleted !`,

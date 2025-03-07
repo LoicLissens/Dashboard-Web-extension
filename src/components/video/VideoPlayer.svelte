@@ -3,13 +3,16 @@
     import {
         setVideosToStorage,
         getVideosFromStorage,
-    } from "../../helpers/manageStorage.ts";
+        type Video,
+        type Channel,
+    } from "../../helpers/manageStorage";
     import { addNotification } from "../../store/store";
 
 
-    export let channel;
-    let videos = [];
-    let hiddenVideos = channel.hiddenVideos.map((v) => v.id);
+    export let channel: Channel;
+    let videos: Array<Video> = [];
+    let hiddenVideosId: Array<string> = channel.hiddenVideos.map((v) => v.id);
+
     async function fetchLastVideo(uploadPlaylistId) {
         const getItemsFromPlaylist =
             await youtubeAPI.getPlaylistItems(uploadPlaylistId);
@@ -29,12 +32,12 @@
     async function hideVideo(video) {
         //TODO: Can be done with an event as channel are already fetched two components ahead
         // but I don't want to re-render all the component just for this
-        if (!hiddenVideos.includes(video.id)) {
+        if (!hiddenVideosId.includes(video.id)) {
             const channels = await getVideosFromStorage();
-            const channelIndex = channels.findIndex((c) => c.id === channel.id);
+            const channelIndex = channels.findIndex((c) => c.channelId === channel.channelId);
             channels[channelIndex].hiddenVideos.push(video);
             await setVideosToStorage(channels);
-            hiddenVideos = channels[channelIndex].hiddenVideos.map((v) => v.id);
+            hiddenVideosId = channels[channelIndex].hiddenVideos.map((v) => v.id);
             addNotification({
             message: `The video ${video.title} won't be show again.`,
             status: "success",
@@ -62,9 +65,10 @@
         <p>Loading...</p>
     {:then}
         {#each videos as video}
-            {#if !hiddenVideos.includes(video.id)}
+            {#if !hiddenVideosId.includes(video.id)}
                 <figure class="image is-16by9">
                     <iframe
+                        title="{video.title}"
                         class="has-ratio"
                         src="https://www.youtube.com/embed/{video.id}"
                         frameborder="0"

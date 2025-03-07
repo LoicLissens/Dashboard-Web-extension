@@ -2,16 +2,19 @@
     import { onMount } from "svelte";
     import youtubeAPI from "../../services/youtubeAPI";
     import {
-        setTobrowserStorage,
-        getFromBrowserStorage,
-        storageKeys
-    } from "../../helpers/manageStorage.ts";
+        setVideosToStorage,
+        getCategoriesFromStorage,
+        getVideosFromStorage,
+        type Channel,
+        type Categories,
+        type Category
+    } from "../../helpers/manageStorage";
     import { addNotification } from "../../store/store";
     import RegisterCategoryModal from "./RegisterCategoryModal.svelte";
     import Tooltip from "../utils/Tooltip.svelte";
 
     let channelId = "";
-    let categories = [];
+    let categories: Categories = [];
     let categoryChannel = "";
     let isAddingChannel = false;
     let isError = false;
@@ -20,7 +23,7 @@
     function closeModal() {
         isModalActive = false;
     }
-    const fetchChannelInfo = async (InputChannelId, category) => {
+    const fetchChannelInfo = async (InputChannelId:string, category:Category) => {
         const getIDs = youtubeAPI.getChannelIDs(InputChannelId);
         const getChannelInfo = youtubeAPI.getChannelInfo(InputChannelId);
         const data = await Promise.all([getIDs, getChannelInfo]).then(
@@ -28,7 +31,7 @@
                 try {
                     const IDs = resp[0].data.items[0];
                     const info = resp[1].data.items[0].snippet;
-                    const fullChannelObj = {
+                    const fullChannelObj: Channel = {
                         category: category,
                         channelId: IDs.id,
                         uploadPlaylistId:
@@ -37,8 +40,8 @@
                         description: info.description,
                         country: info.country,
                         defaultAvatrUrl: info.thumbnails.default.url,
-                        mediumAvatrUrl: info.thumbnails.medium.url,
-                        highAvatrUrl: info.thumbnails.high.url,
+                        mediumAvatarUrl: info.thumbnails.medium.url,
+                        highAvatarUrl: info.thumbnails.high.url,
                         nbVideoToRetrieve: 1,
                         hiddenVideos: [],
                     };
@@ -50,12 +53,11 @@
         );
         return data;
     };
-    const storeChannelInfo = async (InputChannelId, category) => {
+    const storeChannelInfo = async (InputChannelId:string, category:Category) => {
         isAddingChannel = true;
-        const stockedVideo = await getFromBrowserStorage(storageKeys.VIDEO);
+        const channels = await getVideosFromStorage();
         //TODO: pass stocked video as a props
-        const videos = stockedVideo || [];
-        if (videos.some((e) => e.channelId === InputChannelId)) {
+        if (channels.some((e) => e.channelId === InputChannelId)) {
             addNotification({
                 message: "Channel already stored",
                 status: "error",
@@ -69,8 +71,8 @@
                 InputChannelId,
                 category,
             );
-            const toStore = [...videos, channelToStore];
-            await setTobrowserStorage(storageKeys.VIDEO, toStore);
+            const toStore = [...channels, channelToStore];
+            await setVideosToStorage(toStore);
             addNotification({
                 message: "Channel stored",
                 status: "success",
@@ -89,7 +91,7 @@
     };
 
     onMount(async () => {
-        const tempCategories = await getFromBrowserStorage(storageKeys.CATEGORIES);
+        const tempCategories = await getCategoriesFromStorage()
         categories = tempCategories
             ? [...tempCategories]
             : [];
