@@ -2,17 +2,18 @@
     import { onMount, onDestroy } from "svelte";
     import { createEventDispatcher } from "svelte";
     import {
-        setTobrowserStorage,
-        getFromBrowserStorage,
-        StorageKeys
-    } from "../../helpers/manageStorage.ts";
+        setCategoriesToStorage,
+        getCategoriesFromStorage,
+        type Categories,
+        type Category
+    } from "../../helpers/manageStorage";
     import { addNotification } from "../../store/store";
-    import {clickOutside} from "../../helpers/clickOutside";
+    import {clickOutside} from "../../helpers/clickOutside.js";
 
-    export let isModalActive;
-    export let existingCategories;
+    export let isModalActive:boolean;
+    export let existingCategories:Categories;
 
-    let keydownHandler;
+    let keydownHandler:(evt: KeyboardEvent) => void;
     let categoryToRegister = "";
     let isDanger = false;
 
@@ -33,16 +34,13 @@
     onDestroy(() => {
         window.removeEventListener("keydown", keydownHandler);
     });
-    const storeCatergory = async (category) => {
+    const storeCatergory = async (category:Category) => {
         if (!category) {
             isDanger = true;
             return;
         }
-        const stockedCatergories = await getFromBrowserStorage(StorageKeys.CATEGORIES);
-        const tempCategories = stockedCatergories
-            ? [...stockedCatergories]
-            : [];
-        await setTobrowserStorage(StorageKeys.CATEGORIES, [...tempCategories, category]);
+        const stockedCatergories = await getCategoriesFromStorage()
+        await setCategoriesToStorage([...stockedCatergories, category]);
         dispatch("categoryRegistered", categoryToRegister);
         isDanger = false;
         categoryToRegister = "";
@@ -51,15 +49,15 @@
             status: "success",
         });
     };
-    const onEnterPress = async (event) => {
+    const onPressEnter = async (event:KeyboardEvent) => {
         if (event.key === 'Enter') {
             event.preventDefault(); // Prevent form submission
             await storeCatergory(categoryToRegister);
         }
     };
-    const deleteCategory = async (category) => {
+    const deleteCategory = async (category:Category) => {
         const tempCategories = existingCategories.filter((e) => e !== category);
-        await setTobrowserStorage(StorageKeys.CATEGORIES, tempCategories);
+        await setCategoriesToStorage(tempCategories);
         existingCategories = tempCategories;
         addNotification({
             message: `Categorie ${category} deleted !`,
@@ -86,7 +84,7 @@
                     placeholder="Category"
                     type="text"
                     class="input {isDanger && 'is-danger'}"
-                    on:keydown={onEnterPress}
+                    on:keydown={onPressEnter}
                 />
             </div>
             <button

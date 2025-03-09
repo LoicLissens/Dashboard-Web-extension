@@ -1,15 +1,16 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { removeNotification } from "../store/store";
+    import { removeNotification,type Notification,  NotificationStatus} from "../store/store";
 
-    export let notification;
+    export let notification: Notification;
+
     const colorStatusMapper = {
-        success: "is-success",
-        error: "is-danger",
-        warning: "is-warning",
-        info: "is-info",
+        [NotificationStatus.Success]: "is-success",
+        [NotificationStatus.Error]: "is-danger",
+        [NotificationStatus.Warning]: "is-warning",
+        [NotificationStatus.Info]: "is-info",
     };
-    $: colorByStatus = colorStatusMapper[notification.status];
+    $: colorByStatus = colorStatusMapper[notification.status]
 
     onMount(() => {
         setTimeout(() => {

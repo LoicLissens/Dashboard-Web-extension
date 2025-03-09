@@ -1,12 +1,19 @@
-<script>
+<script context="module" lang="ts">
+    export enum Tab {
+        General = "general",
+        Videos = "videos",
+    }
+</script>
+<script lang="ts">
     import { createEventDispatcher } from "svelte";
+
     const dispatch = createEventDispatcher();
 
-    export let activeTab
+    export let activeTab: Tab
 </script>
 <div class="tabs is-small">
     <ul>
-        <li class="{activeTab == 'general' && 'is-active'}">
+        <li class="{activeTab == Tab.General && 'is-active'}">
             <a href="#" on:click={() => dispatch('changeTab', 'general')}
                 ><span class="icon">
                     <svg
@@ -31,7 +38,7 @@
                 </span>General</a
             >
         </li>
-        <li class="{activeTab == 'videos' && 'is-active'}">
+        <li class="{activeTab == Tab.Videos && 'is-active'}">
             <a href="#"  on:click={() => dispatch('changeTab', 'videos')}
                 ><span class="icon">
                     <svg
