@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { notifications } from "./store/store.ts";
+  import { notifications, type Notification as NotificationType } from "./store/store";
 
   import General from "./views/Home.svelte";
   import Sidebar from "./components/layout/Sidebar.svelte";
@@ -7,7 +7,7 @@
   import Notification from "./components/Notification.svelte";
   import Navbar from "./components/layout/Navbar.svelte";
 
-  let notificationsList = [];
+  let notificationsList: Array<NotificationType> = [];
   notifications.subscribe((value) => {
     notificationsList = value;
   });
