@@ -1,14 +1,14 @@
-<script>
+<script lang=ts>
   import { date } from "../store/store";
   import { greeting, msToDate } from "../helpers/time";
   import { onMount } from "svelte";
-  import { getFromBrowserStorage,setTobrowserStorage,storageKeys } from "../helpers/manageStorage";
+  import { getFromBrowserStorage,setTobrowserStorage,StorageKeys } from "../helpers/manageStorage";
   import RegisterModal from "./RegisterModal.svelte";
 
   let name;
 
   function setName(registeredName) {
-      setTobrowserStorage(storageKeys.NAME, registeredName)
+      setTobrowserStorage(StorageKeys.NAME, registeredName)
       .then(() => {
         name = registeredName;
       })
@@ -17,7 +17,7 @@
     });
   }
   onMount(() => {
-    getFromBrowserStorage(storageKeys.NAME)
+    getFromBrowserStorage(StorageKeys.NAME)
       .then((data) => {
         name = data;
       })

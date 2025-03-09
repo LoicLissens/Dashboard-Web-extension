@@ -1,26 +1,26 @@
-<script>
+<script lang="ts">
     import { onMount } from "svelte";
-    import {getFromBrowserStorage,storageKeys,setTobrowserStorage} from "../helpers/manageStorage"
+    import {getFromBrowserStorage,StorageKeys,setTobrowserStorage, Theme} from "../helpers/manageStorage"
 
-    let theme;
-    const changeTheme = (theme) => {
-        const  htmlElement = document.querySelector('html');
+    let theme:Theme;
+    const changeTheme = (them: Theme) => {
+        const  htmlElement = document.querySelector('html') as HTMLElement;
         htmlElement.setAttribute('data-theme', theme);
     }
     const toggleTheme = () => {
-        theme = theme === 'dark' ? 'light' : 'dark';
-        setTobrowserStorage(storageKeys.THEME, theme);
+        theme = theme === Theme.DARK ? Theme.LIGHT : Theme.DARK;
+        setTobrowserStorage(StorageKeys.THEME, theme);
         changeTheme(theme);
     };
     onMount(async() => {
-        const registeredTheme = await getFromBrowserStorage(storageKeys.THEME);
+        const registeredTheme= await getFromBrowserStorage(StorageKeys.THEME);
         if (registeredTheme) {
-            theme = registeredTheme;
+            theme = registeredTheme as Theme;
             changeTheme(theme);
             return;
         }
-        const systemtThemeIsDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        theme = systemtThemeIsDark ? 'dark' : 'light';
+        const systemtThemeIsDark = window.matchMedia(`(prefers-color-scheme: ${Theme.DARK})`).matches;
+        theme = systemtThemeIsDark ? Theme.DARK : Theme.LIGHT;
     });
 </script>
 

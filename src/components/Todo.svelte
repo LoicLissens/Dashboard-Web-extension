@@ -1,25 +1,26 @@
-<script>
+<script lang="ts">
   import {
-    setTobrowserStorage,
-    getFromBrowserStorage,
-    storageKeys
+    setTasksToStorage,
+    getTasksFromStorage,
+    type Tasks,
+    type Task
   } from "../helpers/manageStorage";
   import { onMount } from "svelte";
   import { timeStringToSeconds } from "../helpers/time";
 
-  let newTask = {
+  let newTask: Task = {
     label: undefined,
     hour: undefined,
     done: false,
   };
-  let tasks = [];
+  let tasks:Tasks = [];
   $: sortedTasks = tasks.sort(
-    (a, b) => timeStringToSeconds(a.hour) - timeStringToSeconds(b.hour)
+    (a, b) => timeStringToSeconds(a.hour || "00:00") - timeStringToSeconds(b.hour || "00:00")
   );
   $: disabledButton = newTask.label && newTask.hour ? false : true;
   function addTask() {
     tasks = [...tasks, newTask];
-    setTobrowserStorage(storageKeys.TASKS, tasks).catch((err) => {
+    setTasksToStorage(tasks).catch((err) => {
       console.log(err);
     });
     newTask = {
@@ -28,20 +29,20 @@
       done: false,
     };
   }
-  function removeTask(taskToDelete) {
+  function removeTask(taskToDelete: Task) {
     const newArray = tasks.filter((task) => task.label != taskToDelete);
     tasks = [...newArray];
-    setTobrowserStorage(storageKeys.TASKS, tasks).catch((err) => {
+    setTasksToStorage(tasks).catch((err) => {
       console.log(err);
     });
   }
   function updateTask() {
-    setTobrowserStorage(storageKeys.TASKS, tasks).catch((err) => {
+    setTasksToStorage(tasks).catch((err) => {
       console.log(err);
     });
   }
   onMount(() => {
-    getFromBrowserStorage(storageKeys.TASKS)
+    getTasksFromStorage()
       .then((data) => {
         tasks = data || [];
       })

@@ -6,24 +6,25 @@ const api = axios.create({
     }
 })
 class YoutubeAPI {
+    private API_KEY: string | undefined;
     constructor() {
         this.API_KEY = undefined
     }
 
-    setAPIKey(key) {
+    setAPIKey(key:string) {
         this.API_KEY = key
     }
     // It's only possible to retrieve data on channel with youtube ID channel
-    getChannelIDs(channelId) {
+    getChannelIDs(channelId:string) {
         return api.get(`/channels?part=contentDetails&id=${channelId}&key=${this.API_KEY}`)
     }
-    getChannelInfo(channelId) {
+    getChannelInfo(channelId:string) {
         return api.get(`/channels?part=snippet&id=${channelId}&key=${this.API_KEY}`)
     }
-    getPlaylistItems(playlistId) {
+    getPlaylistItems(playlistId:string) {
         return api.get(`/playlistItems?part=snippet&playlistId=${playlistId}&key=${this.API_KEY}`)
     }
-    getVideoPlayer(videoId) {
+    getVideoPlayer(videoId:string) {
         return api.get(`/videos?part=player&id=${videoId}&key=${this.API_KEY}`)
     }
 }

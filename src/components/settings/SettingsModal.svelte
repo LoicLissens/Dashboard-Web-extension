@@ -1,28 +1,27 @@
-<script>
+
+<script lang="ts">
     import { onMount, onDestroy } from "svelte";
-    import { createEventDispatcher } from 'svelte';
-    import {clickOutside} from "../../helpers/clickOutside"
+    import { createEventDispatcher } from "svelte";
+    import { clickOutside } from "../../helpers/clickOutside";
     import SettingsTabs from "./SettingsTabs.svelte";
+    import { Tab } from "./SettingsTabs.svelte";
     import VideoSettings from "./VideoSettings.svelte";
     import GeneralSettings from "./GeneralSettings.svelte";
 
-    export let isModalActive;
+    export let isModalActive: boolean;
+
     const dispatch = createEventDispatcher();
+    let keydownHandler: (evt: KeyboardEvent) => void;
 
-    let keydownHandler;
-    const settings = [
-        { label: "Home", state: "home" },
-        { label: "Videos", state: "videos" },
-    ];
-    let activeTab = "general";
+    let activeTab: Tab = Tab.General;
 
-    function closeModal(){
-       dispatch("closeModal")
+    function closeModal() {
+        dispatch("closeModal");
     }
     onMount(() => {
-        keydownHandler = function (event) {
+        keydownHandler = function (event: KeyboardEvent) {
             if (event.key === "Escape") {
-                closeModal()
+                closeModal();
             }
         };
 
@@ -42,7 +41,7 @@
                 on:changeTab={(e) => (activeTab = e.detail)}
             />
             {#if activeTab === "general"}
-                <GeneralSettings/>
+                <GeneralSettings />
             {:else if activeTab === "videos"}
                 <VideoSettings />
             {/if}
