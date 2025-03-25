@@ -2,8 +2,7 @@
     import browser from "webextension-polyfill";
     import {clearStorage,getAllFromStorage} from "../../helpers/manageStorage"
 
-    //TODO add export/import validator with Zod
-    // See this https://www.30secondsofcode.org/js/s/json-to-file/#:~:text=Save%20a%20JSON%20object%20to%20a%20file%20in%20the%20browser,event%20to%20download%20the%20file.
+    //TODO add export/import validator with Zod ?
     const saveJsonConfig = async () => {
         const config = await getAllFromStorage()
         const filename = "config";
@@ -18,14 +17,17 @@
         URL.revokeObjectURL(url);
     };
     const clearConfig =  async () => {
-        await clearStorage()
+         if (confirm("Are you sure to delete the entire config ?")){
+            await clearStorage()
+            location.reload()
+         }
     }
 </script>
 
 <div>
     <section>
-        <h5 class="title is-5 has-text-grey has-text-centere">
-            Export JSON file
+        <h5 class="title is-5 has-text-grey my-2">
+            Export/import JSON file
         </h5>
         <button class="button" on:click={saveJsonConfig}>
             <span>Download</span>
@@ -54,26 +56,23 @@
             on:click={async () =>
                 window.alert(JSON.stringify(await browser.storage.local.get()))}
         >
-            Preview
+            Preview Config file
         </button>
     </section>
     <section>
-        <h5 class="title is-5 has-text-grey has-text-centere">
-            Import config
-        </h5>
         <button
-        class="button"
+        class="button mt-1"
     >
         Upload JSON file
     </button>
     </section>
     <section>
-        <h5 class="title is-5 has-text-grey has-text-centere">
+        <h5 class="title is-5 has-text-grey my-2">
             Manage config
         </h5>
         <button
         class="button"
-        on:click={async () => await browser.storage.local.clear()}
+        on:click={clearConfig}
     >
         Delete config
     </button>

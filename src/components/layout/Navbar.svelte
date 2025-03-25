@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import Greetings from "../Greetings.svelte";
     import Theme from "../Theme.svelte";
     import Meteo from "../Meteo.svelte";

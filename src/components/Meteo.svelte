@@ -1,13 +1,12 @@
-<script>
+<script lang="ts">
     import axios from "axios";
     import { onMount } from "svelte";
-    // import { getWeather } from '../api/weather';
 
-    let currTemp;
-    let currUnit;
-    let todayMaxTemp;
-    let todayMinTemp;
-    let todayUnit;
+    let currTemp:number;
+    let currUnit:number;
+    let todayMaxTemp:number;
+    let todayMinTemp:number;
+    let todayUnit:string;
     $: max = todayMaxTemp + todayUnit;
     $: min = todayMinTemp + todayUnit;
     $: curr = currTemp + currUnit;

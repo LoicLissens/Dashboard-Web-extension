@@ -1,3 +1,4 @@
+<script lang="ts"></script>
 <article>
   <h2>Colors:</h2>
   <iframe src="https://colorhunt.co/tab.php" title="colorhunt" />

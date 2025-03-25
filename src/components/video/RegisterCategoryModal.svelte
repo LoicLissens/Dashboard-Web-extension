@@ -95,7 +95,7 @@
         </div>
         <div >
             <h2>Existing categories : </h2>
-            <div>
+            <div class="tags">
                 {#each existingCategories as category}
                     <span class="tag mr-1">{category}<button class="delete is-small" on:click={deleteCategory(category)}></button></span>
                 {/each}

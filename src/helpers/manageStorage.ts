@@ -13,6 +13,10 @@ export enum Theme {
     LIGHT = 'light',
     DARK = 'dark',
 }
+export enum Page{
+    HOME = 'Home',
+    VIDEOS = 'Videos',
+}
 export interface Task {
     id?: string,
     label?: string,

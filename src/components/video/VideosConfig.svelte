@@ -19,7 +19,7 @@
     let isAddingChannel = false;
     let isError = false;
     let isModalActive = false;
-    const tooltipText = "WIP :  How to get a channel ID";
+    const tooltipText = "Visit the github to know ho to get a channel ID";
     function closeModal() {
         isModalActive = false;
     }

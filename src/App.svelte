@@ -1,5 +1,6 @@
 <script lang="ts">
   import { notifications, type Notification as NotificationType } from "./store/store";
+  import {Page} from "./helpers/manageStorage";
 
   import General from "./views/Home.svelte";
   import Sidebar from "./components/layout/Sidebar.svelte";
@@ -11,12 +12,8 @@
   notifications.subscribe((value) => {
     notificationsList = value;
   });
+  let state = Page.VIDEOS;
 
-  const pages = [
-    { label: "Home", state: "home" },
-    { label: "Videos", state: "videos" },
-  ];
-  let state = "videos";
 </script>
 
 <Navbar />
@@ -24,17 +21,17 @@
   {#each notificationsList as notification (notification.id)}
     <Notification {notification} />
   {/each}
-  <Sidebar {pages} on:changePage={(e) => (state = e.detail)} />
-  {#if state === "home"}
+  <Sidebar currentPage={state} on:changePage={(e) => (state = e.detail)} />
+  {#if state === Page.HOME}
     <General />
-  {:else if state === "videos"}
+  {:else if state ===  Page.VIDEOS}
     <Videos />
   {/if}
 </main>
 
 <style>
   main {
-    height: 100vh; /* 100% of the viewport height */
-    width: 100vw; /* 80% of the viewport width */
+    height: 100vh;
+    width: 100vw;
   }
 </style>

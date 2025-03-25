@@ -4,12 +4,16 @@
         getFromBrowserStorage,
         setTobrowserStorage,
         StorageKeys,
+        getCategoriesFromStorage,
+        getVideosFromStorage,
+        type Categories,
+        type Channels
     } from "../../helpers/manageStorage";
     import youtubeAPI from "../../services/youtubeAPI";
 
-    let ytApiKey;
-    let categories;
-    let channels;
+    let ytApiKey: string;
+    let categories: Categories;
+    let channels:Channels;
     let showKey = false;
     let isDisabled = true;
 
@@ -18,16 +22,16 @@
             getFromBrowserStorage(StorageKeys.YOUTUBEAPIKEY).then((data) => {
                 ytApiKey = data;
             }),
-            getFromBrowserStorage(StorageKeys.CATEGORIES).then((data) => {
+            getCategoriesFromStorage().then((data) => {
                 categories = data;
             }),
-            getFromBrowserStorage(StorageKeys.VIDEO).then((data) => {
+            getVideosFromStorage().then((data) => {
                 channels = data;
             }),
         ]);
     });
 
-    async function setApiKey(e) {
+    async function setApiKey(e:SubmitEvent) {
         const apiKey = e.target.elements.key.value;
         await setTobrowserStorage(StorageKeys.YOUTUBEAPIKEY, apiKey);
         youtubeAPI.setAPIKey(apiKey);
@@ -36,15 +40,15 @@
         showKey = false;
     }
 
-    async function setNBVideoToRetrieve(e, channelId) {
-        const nbVideo = e.target.value;
+    async function setNBVideoToRetrieve(e, channelId:string) {
+        const nbVideo = e.target!.value;
         const index = channels.findIndex(
             (channel) => channel.channelId === channelId,
         );
         channels[index].nbVideoToRetrieve = nbVideo;
         await setTobrowserStorage(StorageKeys.VIDEO, channels);
     }
-    async function deleteChannel(channelId) {
+    async function deleteChannel(channelId:string) {
         const index = channels.findIndex(
             (channel) => channel.channelId === channelId
         );
@@ -52,7 +56,7 @@
         channels = channels
         await setTobrowserStorage(StorageKeys.VIDEO, channels);
     }
-    async function deleteHiddenVideo(videoId, channelId) {
+    async function deleteHiddenVideo(videoId:string, channelId:string) {
         const index = channels.findIndex(
             (channel) => channel.channelId === channelId
         );
@@ -172,7 +176,7 @@
         </h4>
         <div>
             {#if categories}
-                <div>
+                <div class="tags">
                     {#each categories as category}
                         <span class="tag mr-1"
                             >{category}<button class="delete is-small"

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import SettingsModal from "./SettingsModal.svelte";
     let isModalActive = false;
     const setModal =  () => {
