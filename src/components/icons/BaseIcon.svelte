@@ -11,7 +11,7 @@
  export let scaleOnHover: boolean = false;
  $:hoverClass = scaleOnHover ? 'hover' : '';
 </script>
-<span class={`icon ${size || ''} ${hoverClass}`}>
+<span class={`icon ${size || ''} ${hoverClass} is-clickable`}>
     <slot></slot>
 </span>
 <style scoped>

@@ -3,7 +3,7 @@
     import { type IconSize } from "./BaseIcon.svelte";
     export let size: IconSize;
     export let isFocused: boolean;
-    $: strokeColor = isFocused ? "hsl(171, 100%, 41%)" : "#A9A9A9";
+    $: strokeColor = isFocused ? "hsl(171, 100%, 41%)" : "currentColor";
 </script>
 
 <BaseIcon {size} scaleOnHover={true}>

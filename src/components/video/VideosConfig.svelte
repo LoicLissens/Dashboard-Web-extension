@@ -7,11 +7,13 @@
         getVideosFromStorage,
         type Channel,
         type Categories,
-        type Category
+        type Category,
     } from "../../helpers/manageStorage";
     import { addNotification } from "../../store/store";
+
     import RegisterCategoryModal from "./RegisterCategoryModal.svelte";
     import Tooltip from "../utils/Tooltip.svelte";
+    import QuestionMarkIcon from "../icons/QuestionMarkIcon.svelte";
 
     let channelId = "";
     let categories: Categories = [];
@@ -23,7 +25,10 @@
     function closeModal() {
         isModalActive = false;
     }
-    const fetchChannelInfo = async (InputChannelId:string, category:Category) => {
+    const fetchChannelInfo = async (
+        InputChannelId: string,
+        category: Category,
+    ) => {
         const getIDs = youtubeAPI.getChannelIDs(InputChannelId);
         const getChannelInfo = youtubeAPI.getChannelInfo(InputChannelId);
         const data = await Promise.all([getIDs, getChannelInfo]).then(
@@ -53,7 +58,10 @@
         );
         return data;
     };
-    const storeChannelInfo = async (InputChannelId:string, category:Category) => {
+    const storeChannelInfo = async (
+        InputChannelId: string,
+        category: Category,
+    ) => {
         isAddingChannel = true;
         const channels = await getVideosFromStorage();
         //TODO: pass stocked video as a props
@@ -91,43 +99,27 @@
     };
 
     onMount(async () => {
-        const tempCategories = await getCategoriesFromStorage()
-        categories = tempCategories
-            ? [...tempCategories]
-            : [];
+        const tempCategories = await getCategoriesFromStorage();
+        categories = tempCategories ? [...tempCategories] : [];
         isModalActive = categories.length === 0;
     });
 </script>
 
 <RegisterCategoryModal
-    isModalActive={isModalActive}
+    {isModalActive}
     existingCategories={categories}
     on:categoryRegistered={(e) => (
-        (categories = [...categories, e.detail]), (closeModal())
+        (categories = [...categories, e.detail]), closeModal()
     )}
     on:closeModal={closeModal}
-
 />
 <div class="my-3 box">
     <h2 class="has-text-centered">
         Enter a channel ID get lasts video from the channel <Tooltip
-            tooltipText={tooltipText}
-            ><span class="icon is-clickable">
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 16 16"
-                    fill="currentColor"
-                    width="0.8rem"
-                    height="0.8rem"
-                >
-                    <path
-                        fill-rule="evenodd"
-                        d="M15 8A7 7 0 1 1 1 8a7 7 0 0 1 14 0Zm-6 3.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM7.293 5.293a1 1 0 1 1 .99 1.667c-.459.134-1.033.566-1.033 1.29v.25a.75.75 0 1 0 1.5 0v-.115a2.5 2.5 0 1 0-2.518-4.153.75.75 0 1 0 1.061 1.06Z"
-                        clip-rule="evenodd"
-                    />
-                </svg>
-            </span></Tooltip
+            {tooltipText}
         >
+            <QuestionMarkIcon />
+        </Tooltip>
     </h2>
     <div class="is-inline-flex">
         <div class="control {isAddingChannel && 'is-loading'}">
@@ -175,6 +167,9 @@
         </button>
     </div>
     <div class="has-text-centered mt-2">
-        <button class="button is-link is-outlined" on:click={() => (isModalActive = true)}>Add categories</button>
+        <button
+            class="button is-link is-outlined"
+            on:click={() => (isModalActive = true)}>Add categories</button
+        >
     </div>
 </div>
