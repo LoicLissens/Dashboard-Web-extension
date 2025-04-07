@@ -14,6 +14,7 @@
     import HideIcon from "../icons/HideIcon.svelte";
     import BaseIcon from "../icons/BaseIcon.svelte";
     import EditIcon from "../icons/EditIcon.svelte";
+    import {IconSize} from "../icons/BaseIcon.svelte";
 
     let ytApiKey: string;
     let categories: Categories;
@@ -95,23 +96,25 @@
                             disabled={isDisabled}
                             name="key"
                         />
+                        <!-- svelte-ignore a11y-click-events-have-key-events -->
                         <span
                             class="icon is-right is-clickable"
                             on:click={() => (showKey = !showKey)}
                         >
                             {#if !showKey}
-                                <ShowIcon size={BaseIcon.Small}/>
+                                <ShowIcon size={IconSize.Small}/>
                             {:else}
-                                <HideIcon/>
+                                <HideIcon size={IconSize.Small}/>
                             {/if}
                         </span>
                     </div>
                 </div>
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <span
                     class="icon is-align-self-center"
                     on:click={editApiKey}
                 >
-                    <EditIcon isFocused={!isDisabled}  />
+                    <EditIcon isFocused={!isDisabled} size={IconSize.Medium}/>
                 </span>
             </div>
         </form>

@@ -1,6 +1,7 @@
 <script context="module" lang="ts">
     import GeneralIcon from "../icons/GeneralIcon.svelte";
     import VideoIcon from "../icons/VideoIcon.svelte";
+    import { IconSize } from "../icons/BaseIcon.svelte";
 
     export enum Tab {
         General = "general",
@@ -20,13 +21,13 @@
     <ul>
         <li class={activeTab == Tab.General && "is-active"}>
             <a href="#" on:click={() => dispatch("changeTab", "general")}>
-                <GeneralIcon /> General</a
+                <GeneralIcon  size="" /> General</a
             >
         </li>
         <li class={activeTab == Tab.Videos && "is-active"}>
             <a href="#" on:click={() => dispatch("changeTab", "videos")}
                 ><span class="icon">
-                   <VideoIcon />
+                   <VideoIcon size="" isFocused={false} />
                 </span>Videos</a
             >
         </li>
