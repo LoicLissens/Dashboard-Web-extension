@@ -1,7 +1,7 @@
 <script lang="ts">
     import browser from "webextension-polyfill";
     import {clearStorage,getAllFromStorage} from "../../helpers/manageStorage"
-
+    import CodeBlock from "../utils/CodeBlock.svelte";
     //TODO add export/import validator with Zod ?
     const saveJsonConfig = async () => {
         const config = await getAllFromStorage()
@@ -58,6 +58,7 @@
         >
             Preview Config file
         </button>
+        <CodeBlock code={JSON.stringify(await browser.storage.local.get())}/>
     </section>
     <section>
         <button
