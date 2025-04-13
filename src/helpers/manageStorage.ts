@@ -1,6 +1,6 @@
 // @ts-ignore
 import browser from "webextension-polyfill";
-
+import { z } from "zod";
 export enum StorageKeys {
     CATEGORIES = 'categories',
     THEME = 'theme',
@@ -48,7 +48,24 @@ export type Categories = Array<Category>
 export type Channels = Array<Channel>
 export type Tasks = Array<Task>
 
+const UserConfigSchema = z.object({
+    categories: z.array(z.string()),
+    name: z.string(),
+    theme: z.enum(["light", "dark"]),
+    youtube: z.string().regex(/^[A-Za-z0-9_-]+$/, {
+      message: "La clé API YouTube doit être au format valide"
+    })
+  }).partial()
 
+  type UserConfig = z.infer<typeof UserConfigSchema>;
+function validateUserConfig(config: unknown): UserConfig {
+    const result = UserConfigSchema.safeParse(config);
+    if (result.success) {
+      return result.data;
+    } else {
+      throw new Error("Données invalides");
+    }
+}
 /**
  * A reusable function to store/update to local browser storage
  * @param {string} key - the key where is store the data

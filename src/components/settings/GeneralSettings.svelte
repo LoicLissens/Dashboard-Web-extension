@@ -1,10 +1,16 @@
 <script lang="ts">
     import browser from "webextension-polyfill";
-    import {clearStorage,getAllFromStorage} from "../../helpers/manageStorage"
+    import {
+        clearStorage,
+        getAllFromStorage,
+    } from "../../helpers/manageStorage";
     import CodeBlock from "../utils/CodeBlock.svelte";
-    //TODO add export/import validator with Zod ?
-    const saveJsonConfig = async () => {
-        const config = await getAllFromStorage()
+    import Expander from "../utils/Expander.svelte";
+
+    let config: string;
+
+    const downloadConfig = async () => {
+        const config = await getAllFromStorage();
         const filename = "config";
         const blob = new Blob([JSON.stringify(config, null, 2)], {
             type: "application/json",
@@ -16,20 +22,26 @@
         a.click();
         URL.revokeObjectURL(url);
     };
-    const clearConfig =  async () => {
-         if (confirm("Are you sure to delete the entire config ?")){
-            await clearStorage()
-            location.reload()
-         }
+    const clearConfig = async () => {
+        if (confirm("Are you sure to delete the entire config ?")) {
+            await clearStorage();
+            location.reload();
+        }
+    };
+    const getConfig = async () => {
+        if (!config) {
+            config = JSON.stringify(await browser.storage.local.get(), null, "\t");
+        }
+    };
+    const uploadConfig = () => {
+        console.log("uploadConfig");
     }
 </script>
 
 <div>
     <section>
-        <h5 class="title is-5 has-text-grey my-2">
-            Export/import JSON file
-        </h5>
-        <button class="button" on:click={saveJsonConfig}>
+        <h5 class="title is-5 has-text-grey my-2">Config JSON file</h5>
+        <button class="button" on:click={downloadConfig}>
             <span>Download</span>
             <span class="icon is-small">
                 <svg
@@ -51,31 +63,26 @@
                 >
             </span>
         </button>
-        <button
-            class="button"
-            on:click={async () =>
-                window.alert(JSON.stringify(await browser.storage.local.get()))}
-        >
-            Preview Config file
+        <button class="button">
+            <span>Upload</span>
         </button>
-        <CodeBlock code={JSON.stringify(await browser.storage.local.get())}/>
-    </section>
-    <section>
-        <button
-        class="button mt-1"
-    >
-        Upload JSON file
-    </button>
-    </section>
-    <section>
-        <h5 class="title is-5 has-text-grey my-2">
-            Manage config
-        </h5>
-        <button
-        class="button"
-        on:click={clearConfig}
-    >
-        Delete config
-    </button>
+        <div class="file">
+            <label class="file-label">
+              <input class="file-input" type="file" accept="json" on:change={uploadConfig} />
+              <span class="file-cta">
+                <span class="file-label"> Choose a file… </span>
+              </span>
+            </label>
+          </div>
+        <button class="button" on:click={clearConfig}> Delete config </button>
+        <Expander title="Current config" titleSize="is-6" expanded={false}>
+            {#await getConfig()}
+               <p class="is-skeleton"></p>
+            {:then}
+                <CodeBlock code={config} />
+            {:catch error}
+                <p>Error: {error.message}</p>
+            {/await}
+        </Expander>
     </section>
 </div>

@@ -3,6 +3,6 @@
 <style>
     .divider {
         border-top: 1px solid #dbdbdb;
-        margin: 1rem 0;
+        margin: 0 0 1rem 0;
     }
 </style>

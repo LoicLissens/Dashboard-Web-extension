@@ -2,10 +2,11 @@
     import Divider from "./Divider.svelte";
     export let expanded: boolean = false;
     export let title: string;
+    export let titleSize = "is-3";
 </script>
 
-<div class="is-flex has-text-grey">
-    <span><p class="title is-3 has-text-grey">{title}</p></span>
+<div class="is-flex has-text-grey mt-1">
+    <span><p class={`title ${titleSize} has-text-grey`}>{title}</p></span>
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <span class="is-clickable is-flex" on:click={() => (expanded = !expanded)}>
         {#if expanded}
