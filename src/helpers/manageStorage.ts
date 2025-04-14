@@ -48,22 +48,25 @@ export type Categories = Array<Category>
 export type Channels = Array<Channel>
 export type Tasks = Array<Task>
 
-const UserConfigSchema = z.object({
+const OptionalUserConfigSchema = z.object({
     categories: z.array(z.string()),
-    name: z.string(),
     theme: z.enum(["light", "dark"]),
     youtube: z.string().regex(/^[A-Za-z0-9_-]+$/, {
       message: "La clé API YouTube doit être au format valide"
     })
   }).partial()
+const UserConfigSchema = OptionalUserConfigSchema.extend({
+    configVersion: z.string(),
+    name: z.string(),
+})
+type UserConfig = z.infer<typeof UserConfigSchema>;
 
-  type UserConfig = z.infer<typeof UserConfigSchema>;
-function validateUserConfig(config: unknown): UserConfig {
+export function validateUserConfig(config: unknown): UserConfig {
     const result = UserConfigSchema.safeParse(config);
     if (result.success) {
       return result.data;
     } else {
-      throw new Error("Données invalides");
+      throw new Error(`Invalid user config: ${result.error}`);
     }
 }
 /**
@@ -90,7 +93,7 @@ export const clearStorage = async (): Promise<void> => {
 }
 //Getters
 export const getAllFromStorage = async () => {
-    await browser.storage.local.get()
+    return await browser.storage.local.get()
 }
 export const getVideosFromStorage = async (): Promise<Channels> => {
     const channels = await getFromBrowserStorage(StorageKeys.VIDEO) as Channels

@@ -1,20 +1,35 @@
 <script lang="ts">
-    import browser from "webextension-polyfill";
     import {
         clearStorage,
         getAllFromStorage,
+        validateUserConfig
     } from "../../helpers/manageStorage";
     import CodeBlock from "../utils/CodeBlock.svelte";
     import Expander from "../utils/Expander.svelte";
 
-    let config: string;
+    interface ParsedData {
+        [key: string]: any;
+    }
 
+    let JSONConfig: string;
+    const getJSONConfig = async () => {
+        if (!JSONConfig) {
+            const config = await getAllFromStorage();
+            config.configVersion = "1.0.0"
+            JSONConfig = JSON.stringify(
+                config,
+                null,
+                "\t",
+            );
+        }
+    };
     const downloadConfig = async () => {
-        const config = await getAllFromStorage();
-        const filename = "config";
-        const blob = new Blob([JSON.stringify(config, null, 2)], {
+        await getJSONConfig();
+        const filename = `config_${new Date().toLocaleDateString("fr-BE")}.json`;
+        const blob = new Blob([JSONConfig], {
             type: "application/json",
         });
+
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
@@ -22,20 +37,42 @@
         a.click();
         URL.revokeObjectURL(url);
     };
+
     const clearConfig = async () => {
         if (confirm("Are you sure to delete the entire config ?")) {
             await clearStorage();
             location.reload();
         }
     };
-    const getConfig = async () => {
-        if (!config) {
-            config = JSON.stringify(await browser.storage.local.get(), null, "\t");
+
+    const uploadConfig = (e: Event): void => {
+        const input = e.target as HTMLInputElement;
+        if (!input.files || input.files.length === 0) {
+            return;
         }
+        const file = input.files[0];
+        if (file.type !== "application/json") {
+            alert("Please upload a valid JSON file");
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = function (e: ProgressEvent<FileReader>) {
+            try {
+                const content = e.target?.result as string;
+                const parsedData: ParsedData = JSON.parse(content);
+                const userConfig = validateUserConfig(parsedData);
+                console.log(userConfig); //TODO: remove
+            } catch (error) {
+                console.log(error); //TODO: remove
+            }
+        };
+
+        reader.onerror = function () {
+            console.log(reader.error);
+        };
+
+        reader.readAsText(file);
     };
-    const uploadConfig = () => {
-        console.log("uploadConfig");
-    }
 </script>
 
 <div>
@@ -63,23 +100,25 @@
                 >
             </span>
         </button>
-        <button class="button">
-            <span>Upload</span>
-        </button>
         <div class="file">
             <label class="file-label">
-              <input class="file-input" type="file" accept="json" on:change={uploadConfig} />
-              <span class="file-cta">
-                <span class="file-label"> Choose a file… </span>
-              </span>
+                <input
+                    class="file-input"
+                    type="file"
+                    accept="application/JSON"
+                    on:change={uploadConfig}
+                />
+                <span class="file-cta">
+                    <span class="file-label"> Upload Config </span>
+                </span>
             </label>
-          </div>
+        </div>
         <button class="button" on:click={clearConfig}> Delete config </button>
         <Expander title="Current config" titleSize="is-6" expanded={false}>
-            {#await getConfig()}
-               <p class="is-skeleton"></p>
+            {#await getJSONConfig()}
+                <p class="is-skeleton"></p>
             {:then}
-                <CodeBlock code={config} />
+                <CodeBlock code={JSONConfig} />
             {:catch error}
                 <p>Error: {error.message}</p>
             {/await}
