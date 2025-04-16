@@ -6,7 +6,7 @@
         type Categories,
         type Category,
     } from "../../helpers/manageStorage";
-    import { addNotification } from "../../store/store";
+    import { addNotification,NotificationStatus } from "../../store/store";
     import Modal from "../utils/Modal.svelte";
 
     export let isModalActive: boolean;
@@ -31,7 +31,7 @@
         categoryToRegister = "";
         addNotification({
             message: "Catergory registered",
-            status: "success",
+            status: NotificationStatus.Success,
         });
     };
     const onPressEnter = async (event: KeyboardEvent) => {
@@ -52,13 +52,13 @@
 </script>
 
 <Modal {isModalActive} on:closeModal={closeModal}>
-    <div class="is-flex">
+    <div class="is-flex is-justify-content-space-between">
         <h1
             class="title has-text-weight-semibold has-text-centered has-text-grey"
         >
             Register a video category
         </h1>
-        <kbd class="key is-align-content-end">esc</kbd>
+        <kbd class="key">esc</kbd>
     </div>
     <div class="is-flex is-justify-content-center">
         <div class="px-2">

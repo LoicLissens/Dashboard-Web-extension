@@ -117,3 +117,6 @@ export const setCategoriesToStorage = async (payload: Categories): Promise<void>
 export const setTasksToStorage = async (payload: Tasks): Promise<void> => {
     await setTobrowserStorage(StorageKeys.TASKS, payload)
 }
+export const setFullConfigToStorage = async (payload: UserConfig): Promise<void> => {
+    await browser.storage.local.set(payload)
+}

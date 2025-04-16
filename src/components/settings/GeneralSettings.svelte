@@ -2,17 +2,16 @@
     import {
         clearStorage,
         getAllFromStorage,
-        validateUserConfig
+
     } from "../../helpers/manageStorage";
     import CodeBlock from "../utils/CodeBlock.svelte";
     import Expander from "../utils/Expander.svelte";
+    import ConfigFileUploader from "./ConfigFileUploader.svelte";
 
-    interface ParsedData {
-        [key: string]: any;
-    }
 
     let JSONConfig: string;
-    const getJSONConfig = async () => {
+
+    const getJSONConfig = async (): Promise<void> => {
         if (!JSONConfig) {
             const config = await getAllFromStorage();
             config.configVersion = "1.0.0"
@@ -23,7 +22,8 @@
             );
         }
     };
-    const downloadConfig = async () => {
+
+    const downloadConfig = async (): Promise<void> => {
         await getJSONConfig();
         const filename = `config_${new Date().toLocaleDateString("fr-BE")}.json`;
         const blob = new Blob([JSONConfig], {
@@ -38,47 +38,19 @@
         URL.revokeObjectURL(url);
     };
 
-    const clearConfig = async () => {
+    const clearConfig = async (): Promise<void> => {
         if (confirm("Are you sure to delete the entire config ?")) {
             await clearStorage();
             location.reload();
         }
     };
 
-    const uploadConfig = (e: Event): void => {
-        const input = e.target as HTMLInputElement;
-        if (!input.files || input.files.length === 0) {
-            return;
-        }
-        const file = input.files[0];
-        if (file.type !== "application/json") {
-            alert("Please upload a valid JSON file");
-            return;
-        }
-        const reader = new FileReader();
-        reader.onload = function (e: ProgressEvent<FileReader>) {
-            try {
-                const content = e.target?.result as string;
-                const parsedData: ParsedData = JSON.parse(content);
-                const userConfig = validateUserConfig(parsedData);
-                console.log(userConfig); //TODO: remove
-            } catch (error) {
-                console.log(error); //TODO: remove
-            }
-        };
-
-        reader.onerror = function () {
-            console.log(reader.error);
-        };
-
-        reader.readAsText(file);
-    };
 </script>
 
 <div>
     <section>
         <h5 class="title is-5 has-text-grey my-2">Config JSON file</h5>
-        <button class="button" on:click={downloadConfig}>
+        <button class="button is-success is-outlined" on:click={downloadConfig}>
             <span>Download</span>
             <span class="icon is-small">
                 <svg
@@ -100,20 +72,10 @@
                 >
             </span>
         </button>
-        <div class="file">
-            <label class="file-label">
-                <input
-                    class="file-input"
-                    type="file"
-                    accept="application/JSON"
-                    on:change={uploadConfig}
-                />
-                <span class="file-cta">
-                    <span class="file-label"> Upload Config </span>
-                </span>
-            </label>
-        </div>
-        <button class="button" on:click={clearConfig}> Delete config </button>
+        <ConfigFileUploader/>
+        <button class="button is-danger is-outlined is-light" on:click={clearConfig}>
+            Delete config
+        </button>
         <Expander title="Current config" titleSize="is-6" expanded={false}>
             {#await getJSONConfig()}
                 <p class="is-skeleton"></p>
