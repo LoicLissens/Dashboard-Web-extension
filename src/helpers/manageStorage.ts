@@ -8,12 +8,14 @@ export enum StorageKeys {
     YOUTUBEAPIKEY = 'youtube',
     TASKS = 'tasks',
     NAME = 'name',
+    METEO_CACHE = 'meteoCache',
 }
+
 export enum Theme {
     LIGHT = 'light',
     DARK = 'dark',
 }
-export enum Page{
+export enum Page {
     HOME = 'Home',
     VIDEOS = 'Videos',
 }
@@ -42,6 +44,14 @@ export interface Channel {
     nbVideoToRetrieve: number
     hiddenVideos: Array<Video>
 }
+export interface MeteoCache {
+    createdAt: number,
+    currTemp: number,
+    currUnit: number,
+    todayMaxTemp: number,
+    todayMinTemp: number,
+    todayUnit:string
+}
 
 export type Category = string
 export type Categories = Array<Category>
@@ -52,9 +62,9 @@ const OptionalUserConfigSchema = z.object({
     categories: z.array(z.string()),
     theme: z.enum(["light", "dark"]),
     youtube: z.string().regex(/^[A-Za-z0-9_-]+$/, {
-      message: "La clé API YouTube doit être au format valide"
+        message: "La clé API YouTube doit être au format valide"
     })
-  }).partial()
+}).partial()
 const UserConfigSchema = OptionalUserConfigSchema.extend({
     configVersion: z.string(),
     name: z.string(),
@@ -64,9 +74,9 @@ type UserConfig = z.infer<typeof UserConfigSchema>;
 export function validateUserConfig(config: unknown): UserConfig {
     const result = UserConfigSchema.safeParse(config);
     if (result.success) {
-      return result.data;
+        return result.data;
     } else {
-      throw new Error(`Invalid user config: ${result.error}`);
+        throw new Error(`Invalid user config: ${result.error}`);
     }
 }
 /**
@@ -91,9 +101,18 @@ export const getFromBrowserStorage = async (key: StorageKeys): Promise<unknown |
 export const clearStorage = async (): Promise<void> => {
     await browser.storage.local.clear()
 }
+
+
 //Getters
 export const getAllFromStorage = async () => {
     return await browser.storage.local.get()
+}
+export const getUserConfigFromStorage = async ():Promise<UserConfig> => {
+    const fullStorage =  await browser.storage.local.get()
+    return  Object.fromEntries(
+        Object.entries(fullStorage).filter(([key]) => ![StorageKeys.METEO_CACHE as string].includes(key))
+      ) as UserConfig;
+
 }
 export const getVideosFromStorage = async (): Promise<Channels> => {
     const channels = await getFromBrowserStorage(StorageKeys.VIDEO) as Channels
@@ -107,6 +126,10 @@ export const getTasksFromStorage = async (): Promise<Tasks> => {
     const tasks = await getFromBrowserStorage(StorageKeys.TASKS) as Tasks
     return tasks ? [...tasks] : []
 }
+export const getMeteoCacheFromStorage = async (): Promise<MeteoCache> => {
+    return await getFromBrowserStorage(StorageKeys.METEO_CACHE) as MeteoCache
+}
+
 //setter
 export const setVideosToStorage = async (payload: Channels): Promise<void> => {
     await setTobrowserStorage(StorageKeys.VIDEO, payload)
@@ -119,4 +142,8 @@ export const setTasksToStorage = async (payload: Tasks): Promise<void> => {
 }
 export const setFullConfigToStorage = async (payload: UserConfig): Promise<void> => {
     await browser.storage.local.set(payload)
+}
+export const setMeteoCacheToStorage = async (payload: MeteoCache): Promise<void> => {
+    console.log("setMeteoCacheToStorage", payload);
+    await setTobrowserStorage(StorageKeys.METEO_CACHE, payload)
 }

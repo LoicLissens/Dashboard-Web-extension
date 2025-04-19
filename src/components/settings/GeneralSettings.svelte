@@ -1,7 +1,7 @@
 <script lang="ts">
     import {
         clearStorage,
-        getAllFromStorage,
+        getUserConfigFromStorage,
 
     } from "../../helpers/manageStorage";
     import CodeBlock from "../utils/CodeBlock.svelte";
@@ -13,7 +13,7 @@
 
     const getJSONConfig = async (): Promise<void> => {
         if (!JSONConfig) {
-            const config = await getAllFromStorage();
+            const config = await getUserConfigFromStorage();
             config.configVersion = "1.0.0"
             JSONConfig = JSON.stringify(
                 config,
