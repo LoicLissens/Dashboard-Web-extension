@@ -5,7 +5,7 @@
     import Settings from "../settings/Settings.svelte";
 </script>
 
-<nav class="navbar">
+<nav class="navbar is-fixed-top">
     <div class="navbar-brand">
         <Greetings />
     </div>

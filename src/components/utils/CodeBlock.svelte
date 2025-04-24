@@ -1,6 +1,7 @@
 <script lang="ts">
     import hljs from "highlight.js/lib/core";
     import json from "highlight.js/lib/languages/json";
+    // import "highlight.js/styles/atom-one-dark.css";
     import { onMount } from "svelte";
 
     export let code: string;
@@ -29,12 +30,12 @@
         color: #b58900;
     }
     pre {
-        background-color: #f6f8fa;
+        background-color:  #282c34;
         border-radius: 4px;
-        padding: 16px;
-        overflow: auto;
+        padding: 0px;
     }
     code {
         font-family: monospace;
+        overflow: auto;
     }
 </style>

@@ -1,13 +1,11 @@
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { createEventDispatcher } from "svelte";
     import youtubeAPI from "../../services/youtubeAPI";
     import {
         setVideosToStorage,
-        getCategoriesFromStorage,
-        getVideosFromStorage,
-        type Channel,
         type Categories,
         type Category,
+        type Channels
     } from "../../helpers/manageStorage";
     import { addNotification, NotificationStatus } from "../../store/store";
 
@@ -15,13 +13,18 @@
     import Tooltip from "../utils/Tooltip.svelte";
     import QuestionMarkIcon from "../icons/QuestionMarkIcon.svelte";
 
+    export let channels:Channels = [];
+    export let categories: Categories = [];
+
     let channelURL = "";
-    let categories: Categories = [];
     let categoryChannel = "";
     let isAddingChannel = false;
     let isError = false;
-    let isModalActive = false;
+    let isModalActive = categories.length === 0;
+
+    const dispatch = createEventDispatcher();
     const tooltipText = "Eg: https://www.youtube.com/@grafikart";
+
     function closeModal() {
         isModalActive = false;
     }
@@ -31,47 +34,32 @@
     ): Promise<void> => {
         isAddingChannel = true;
         try {
-            const channelID =
+            const newChannelID =
                 await youtubeAPI.getChannelIDfromURL(InputChannelURL);
-            const channels = await getVideosFromStorage();
-            //TODO: pass stocked video as a props
-            if (channels.some((e) => e.channelId === channelID)) {
-                addNotification({
-                    message: "Channel already stored",
-                    status: NotificationStatus.Error,
-                });
+            if (channels.some((e) => e.channelId === newChannelID)) {
+                addNotification("Channel already registered",NotificationStatus.Error);
                 isAddingChannel = false;
                 isError = true;
                 return;
             }
-            const channelToStore = await youtubeAPI.fetchChannelInfo(
-                channelID,
+            const newChannel = await youtubeAPI.fetchChannelInfo(
+                newChannelID,
                 category,
             );
-            const toStore = [...channels, channelToStore];
+            const toStore = [...channels, newChannel];
             await setVideosToStorage(toStore);
-            addNotification({
-                message: "Channel stored",
-                status: NotificationStatus.Success,
-            });
+            addNotification("Channel registered",NotificationStatus.Success);
             isAddingChannel = false;
             channelURL = "";
             isError = false;
+            dispatch("channelRegistered", toStore);
         } catch (e) {
             isAddingChannel = false;
             isError = true;
-            addNotification({
-                message: "Channel not found",
-                status: NotificationStatus.Error,
-            });
+            addNotification("Channel not found",NotificationStatus.Error);
         }
     };
 
-    onMount(async () => {
-        const tempCategories = await getCategoriesFromStorage();
-        categories = tempCategories ? [...tempCategories] : [];
-        isModalActive = categories.length === 0;
-    });
 </script>
 
 <RegisterCategoryModal
@@ -80,6 +68,9 @@
     on:categoryRegistered={(e) => (
         (categories = [...categories, e.detail]), closeModal()
     )}
+    on:categoryDeleted={(e) => {
+        categories = categories.filter((c) => c !== e.detail);
+    }}
     on:closeModal={closeModal}
 />
 <div class="my-3 box">

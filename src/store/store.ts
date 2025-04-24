@@ -24,9 +24,10 @@ export const date = readable(Date.now(), function start(set) {
 
 export const notifications:Writable<Notification[]> = writable([]);
 
-export function addNotification(notification:Notification): void {
+export function addNotification(message:string, status:NotificationStatus): void {
+
 	// @ts-ignore
-  notifications.update(n => [...n, { id: Date.now(),  ...notification }]);
+  notifications.update(n => [...n, { id: Date.now(), status, message }]);
 }
 export function removeNotification(id:Date): void {
   notifications.update(n => n.filter(notification => notification.id !== id));

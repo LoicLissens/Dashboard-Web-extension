@@ -29,10 +29,7 @@
                 await setFullConfigToStorage(userConfig);
                 window.location.reload();
             } catch (error) {
-                addNotification({
-                    message: "Invalid config file",
-                    status: NotificationStatus.Error,
-                });
+                addNotification("Invalid config file",NotificationStatus.Error)
             }
         };
 
@@ -43,7 +40,7 @@
     };
 </script>
 
-<div class="file is-inline-block is-info">
+<div class="file is-inline-block is-link">
     <label class="file-label">
         <input
             class="file-input"

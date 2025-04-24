@@ -6,18 +6,18 @@
         type Video,
         type Channel,
     } from "../../helpers/manageStorage";
-    import { addNotification } from "../../store/store";
-
+    import { addNotification,NotificationStatus } from "../../store/store";
 
     export let channel: Channel;
+
     let videos: Array<Video> = [];
     let hiddenVideosId: Array<string> = channel.hiddenVideos.map((v) => v.id);
 
-    async function fetchLastVideo(uploadPlaylistId) {
+    async function fetchLastVideo(uploadPlaylistId:string) {
         const getItemsFromPlaylist =
             await youtubeAPI.getPlaylistItems(uploadPlaylistId);
         for (let i = 0; i <= channel.nbVideoToRetrieve - 1; i++) {
-            let video = {
+            let video: Video = {
                 title: getItemsFromPlaylist.data.items[i].snippet.title,
                 thumbnail:
                     getItemsFromPlaylist.data.items[i].snippet.thumbnails.medium
@@ -29,7 +29,7 @@
         }
     }
 
-    async function hideVideo(video) {
+    async function hideVideo(video:Video) {
         //TODO: Can be done with an event as channel are already fetched two components ahead
         // but I don't want to re-render all the component just for this
         if (!hiddenVideosId.includes(video.id)) {
@@ -38,10 +38,7 @@
             channels[channelIndex].hiddenVideos.push(video);
             await setVideosToStorage(channels);
             hiddenVideosId = channels[channelIndex].hiddenVideos.map((v) => v.id);
-            addNotification({
-            message: `The video ${video.title} won't be show again.`,
-            status: "success",
-        })
+            addNotification(`The video ${video.title} won't be show again.`,NotificationStatus.Success)
         }
     }
 </script>
@@ -64,7 +61,7 @@
     {#await fetchLastVideo(channel.uploadPlaylistId)}
         <p>Loading...</p>
     {:then}
-        {#each videos as video}
+        {#each videos as video (video.id)}
             {#if !hiddenVideosId.includes(video.id)}
                 <figure class="image is-16by9">
                     <iframe
@@ -78,7 +75,7 @@
                 <label class="checkbox">
                     <input
                         type="checkbox"
-                        on:change={(e) => hideVideo(video)}
+                        on:change={() => hideVideo(video)}
                     />
                     Hide this video
                 </label>

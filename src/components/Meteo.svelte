@@ -32,7 +32,8 @@
             todayMinTemp = cachedData.todayMinTemp;
             todayUnit = cachedData.todayUnit;
             // Still populate even if cached data are outdated as getCurrentPosition can take a while, when data are retrieved it will be updated
-            useCachedData = cachedData.createdAt + cachedDataLifetime > Date.now();
+            useCachedData =
+                cachedData.createdAt + cachedDataLifetime > Date.now();
         }
         return useCachedData;
     }
@@ -66,15 +67,11 @@
                         todayUnit: todayUnit,
                     }).then(() => {
                         isUpdatingMeteoData = false;
+                        addNotification("Meteo data updated", NotificationStatus.Success);
                     });
                 });
             },
-            () => {
-                addNotification({
-                    message: "Couldn't retrieve geolocation data, unable to get meteo data",
-                    status: NotificationStatus.Error,
-                });
-            },
+            () => addNotification("Couldn't retrieve geolocation data, unable to get meteo data",NotificationStatus.Error),
             options,
         );
     }
@@ -86,10 +83,7 @@
         if (navigator.geolocation) {
             await retrieveMeteodataWithGeolocation();
         } else {
-            addNotification({
-                message: "Geolocation is not supported by this browser.",
-                status: NotificationStatus.Error,
-            });
+            addNotification("Geolocation is not supported by this browser.",NotificationStatus.Error);
         }
     }
 
@@ -106,7 +100,7 @@
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 stroke-width="1.5"
-                stroke={currTemp ? "#E84545" :  "currentColor"}
+                stroke={currTemp ? "#E84545" : "currentColor"}
                 width="1rem"
                 height="1rem"
             >
@@ -125,7 +119,7 @@
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 stroke-width="1.5"
-                stroke={currTemp ? "#256fff" :  "currentColor"}
+                stroke={currTemp ? "#256fff" : "currentColor"}
                 width="1rem"
                 height="1rem"
             >

@@ -12,9 +12,9 @@
     import youtubeAPI from "../../services/youtubeAPI";
     import ShowIcon from "../icons/ShowIcon.svelte";
     import HideIcon from "../icons/HideIcon.svelte";
-    import BaseIcon from "../icons/BaseIcon.svelte";
     import EditIcon from "../icons/EditIcon.svelte";
     import {IconSize} from "../icons/BaseIcon.svelte";
+    import Divider from "../utils/Divider.svelte";
 
     let ytApiKey: string;
     let categories: Categories;
@@ -81,7 +81,7 @@
 
 <div>
     <!-- TODO Refactor if/else, It suck this way I think AND MAKE A COMPONENT-->
-    <h4 class="title is-4 title has-text-grey has-text-centere">
+    <h4 class="title is-4 has-text-grey my-2">
         Youtube API Key
     </h4>
     {#if ytApiKey}
@@ -134,13 +134,14 @@
     {/if}
     <!--Catergory part-->
     <div>
-        <h4 class="title is-4 title has-text-grey has-text-centere">
+        <h4 class="title is-4 has-text-grey my-2">
             Categories
         </h4>
         <div>
             {#if categories}
                 <div class="tags">
                     {#each categories as category}
+                        <!--TODO Add delete action and try to retregger component if something change in the settings-->
                         <span class="tag mr-1"
                             >{category}<button class="delete is-small"
                             ></button></span
@@ -151,20 +152,23 @@
         </div>
     </div>
     <div>
-        <h4 class="title is-4 title has-text-grey has-text-centere">
+        <h4 class="title is-4 title has-text-grey my-2">
             Channels
         </h4>
         <div>
             {#if channels}
                 <div>
-                    {#each channels as channel}
+                    {#each channels as channel,i}
+                            {#if i != 0}
+                                <Divider/>
+                            {/if}
                             <div>
                                 Name : {channel.name}
                                 <button class="delete" on:click={deleteChannel(channel.channelId)}></button>
                             </div>
                             <div>
                                 Number of video to retrieve : <input
-                                     type="number"
+                                    type="number"
                                     min="1"
                                     max="5"
                                     value={channel.nbVideoToRetrieve}
@@ -175,7 +179,7 @@
                                         )}
                                 />
                             </div>
-                            <div >
+                            <div class="mb-2">
                                 Hidden videos :
                                 {#each channel.hiddenVideos as video}
                                         {video.title} <button class="delete" on:click={()=>deleteHiddenVideo(video.id,channel.channelId)}></button>

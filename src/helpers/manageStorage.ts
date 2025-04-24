@@ -144,6 +144,5 @@ export const setFullConfigToStorage = async (payload: UserConfig): Promise<void>
     await browser.storage.local.set(payload)
 }
 export const setMeteoCacheToStorage = async (payload: MeteoCache): Promise<void> => {
-    console.log("setMeteoCacheToStorage", payload);
     await setTobrowserStorage(StorageKeys.METEO_CACHE, payload)
 }

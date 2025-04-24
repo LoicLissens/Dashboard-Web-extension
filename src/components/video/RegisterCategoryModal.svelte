@@ -16,12 +16,20 @@
     let isDanger = false;
 
     const dispatch = createEventDispatcher();
+
     function closeModal() {
+        isDanger = false;
+        categoryToRegister = "";
         dispatch("closeModal")
     }
     const storeCatergory = async (category: Category) => {
-        if (!category) {
+        if (!category){
             isDanger = true;
+            return;
+        }
+        if (existingCategories.includes(category)) {
+            isDanger = true;
+            addNotification(`Category ${category} already exists`, NotificationStatus.Warning);
             return;
         }
         const stockedCatergories = await getCategoriesFromStorage();
@@ -29,10 +37,7 @@
         dispatch("categoryRegistered", categoryToRegister);
         isDanger = false;
         categoryToRegister = "";
-        addNotification({
-            message: "Catergory registered",
-            status: NotificationStatus.Success,
-        });
+        addNotification("Catergory registered",NotificationStatus.Success);
     };
     const onPressEnter = async (event: KeyboardEvent) => {
         if (event.key === "Enter") {
@@ -41,13 +46,9 @@
         }
     };
     const deleteCategory = async (category: Category) => {
-        const tempCategories = existingCategories.filter((e) => e !== category);
-        await setCategoriesToStorage(tempCategories);
-        existingCategories = tempCategories;
-        addNotification({
-            message: `Categorie ${category} deleted !`,
-            status: "success",
-        });
+        await setCategoriesToStorage(existingCategories.filter((e) => e !== category));
+        dispatch("categoryDeleted", category);
+        addNotification(`Categorie ${category} deleted !`, NotificationStatus.Success);
     };
 </script>
 
@@ -83,7 +84,7 @@
                 <span class="tag mr-1"
                     >{category}<button
                         class="delete is-small"
-                        on:click={deleteCategory(category)}
+                        on:click={()=>deleteCategory(category)}
                     ></button></span
                 >
             {/each}
