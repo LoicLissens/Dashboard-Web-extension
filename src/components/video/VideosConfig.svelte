@@ -9,91 +9,60 @@
         type Categories,
         type Category,
     } from "../../helpers/manageStorage";
-    import { addNotification } from "../../store/store";
+    import { addNotification, NotificationStatus } from "../../store/store";
 
     import RegisterCategoryModal from "./RegisterCategoryModal.svelte";
     import Tooltip from "../utils/Tooltip.svelte";
     import QuestionMarkIcon from "../icons/QuestionMarkIcon.svelte";
 
-    let channelId = "";
+    let channelURL = "";
     let categories: Categories = [];
     let categoryChannel = "";
     let isAddingChannel = false;
     let isError = false;
     let isModalActive = false;
-    const tooltipText = "Visit the github to know ho to get a channel ID";
+    const tooltipText = "Eg: https://www.youtube.com/@grafikart";
     function closeModal() {
         isModalActive = false;
     }
-    const fetchChannelInfo = async (
-        InputChannelId: string,
-        category: Category,
-    ) => {
-        const getIDs = youtubeAPI.getChannelIDs(InputChannelId);
-        const getChannelInfo = youtubeAPI.getChannelInfo(InputChannelId);
-        const data = await Promise.all([getIDs, getChannelInfo]).then(
-            (resp) => {
-                try {
-                    const IDs = resp[0].data.items[0];
-                    const info = resp[1].data.items[0].snippet;
-                    const fullChannelObj: Channel = {
-                        category: category,
-                        channelId: IDs.id,
-                        uploadPlaylistId:
-                            IDs.contentDetails.relatedPlaylists.uploads,
-                        name: info.title,
-                        description: info.description,
-                        country: info.country,
-                        defaultAvatrUrl: info.thumbnails.default.url,
-                        mediumAvatarUrl: info.thumbnails.medium.url,
-                        highAvatarUrl: info.thumbnails.high.url,
-                        nbVideoToRetrieve: 1,
-                        hiddenVideos: [],
-                    };
-                    return fullChannelObj;
-                } catch (e) {
-                    throw new Error("Channel not found");
-                }
-            },
-        );
-        return data;
-    };
     const storeChannelInfo = async (
-        InputChannelId: string,
+        InputChannelURL: string,
         category: Category,
-    ) => {
+    ): Promise<void> => {
         isAddingChannel = true;
-        const channels = await getVideosFromStorage();
-        //TODO: pass stocked video as a props
-        if (channels.some((e) => e.channelId === InputChannelId)) {
-            addNotification({
-                message: "Channel already stored",
-                status: "error",
-            });
-            isAddingChannel = false;
-            isError = true;
-            return;
-        }
         try {
-            const channelToStore = await fetchChannelInfo(
-                InputChannelId,
+            const channelID =
+                await youtubeAPI.getChannelIDfromURL(InputChannelURL);
+            const channels = await getVideosFromStorage();
+            //TODO: pass stocked video as a props
+            if (channels.some((e) => e.channelId === channelID)) {
+                addNotification({
+                    message: "Channel already stored",
+                    status: NotificationStatus.Error,
+                });
+                isAddingChannel = false;
+                isError = true;
+                return;
+            }
+            const channelToStore = await youtubeAPI.fetchChannelInfo(
+                channelID,
                 category,
             );
             const toStore = [...channels, channelToStore];
             await setVideosToStorage(toStore);
             addNotification({
                 message: "Channel stored",
-                status: "success",
+                status: NotificationStatus.Success,
             });
             isAddingChannel = false;
-            channelId = "";
+            channelURL = "";
             isError = false;
         } catch (e) {
             isAddingChannel = false;
             isError = true;
             addNotification({
                 message: "Channel not found",
-                status: "error",
+                status: NotificationStatus.Error,
             });
         }
     };
@@ -115,17 +84,15 @@
 />
 <div class="my-3 box">
     <h2 class="has-text-centered">
-        Enter a channel ID get lasts video from the channel <Tooltip
-            {tooltipText}
-        >
+        Enter an URL channel to get lasts videos.<Tooltip {tooltipText}>
             <QuestionMarkIcon />
         </Tooltip>
     </h2>
     <div class="is-inline-flex">
         <div class="control {isAddingChannel && 'is-loading'}">
             <input
-                bind:value={channelId}
-                placeholder="channel ID"
+                bind:value={channelURL}
+                placeholder="Channel URL"
                 type="text"
                 class="input {isError && 'is-danger'}"
             />
@@ -144,8 +111,8 @@
         </div>
         <button
             class="button is-primary is-outlined has-text-grey"
-            disabled={isAddingChannel || !categoryChannel || !channelId}
-            on:click={() => storeChannelInfo(channelId, categoryChannel)}
+            disabled={isAddingChannel || !categoryChannel || !channelURL}
+            on:click={() => storeChannelInfo(channelURL, categoryChannel)}
         >
             <span class="icon">
                 <svg

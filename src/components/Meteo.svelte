@@ -7,6 +7,7 @@
     } from "../helpers/manageStorage";
     import Tooltip from "./utils/Tooltip.svelte";
     import QuestionMarkIcon from "./icons/QuestionMarkIcon.svelte";
+    import { addNotification, NotificationStatus } from "../store/store";
 
     let currTemp: number;
     let currUnit: number;
@@ -19,8 +20,8 @@
     $: min = todayMinTemp + todayUnit;
     $: curr = currTemp + currUnit;
 
-    async function getMeteoData() {
-        const cachedDataLifetime = 3600000 * 12; // 12 hours
+    async function retrieveCachedMeteoData(): Promise<boolean> {
+        const cachedDataLifetime = 3600000 * 6; // 6 hours
         const cachedData = await getMeteoCacheFromStorage();
         let useCachedData = false;
 
@@ -30,53 +31,65 @@
             todayMaxTemp = cachedData.todayMaxTemp;
             todayMinTemp = cachedData.todayMinTemp;
             todayUnit = cachedData.todayUnit;
-
             // Still populate even if cached data are outdated as getCurrentPosition can take a while, when data are retrieved it will be updated
-            useCachedData =
-                cachedData.createdAt + cachedDataLifetime > Date.now();
+            useCachedData = cachedData.createdAt + cachedDataLifetime > Date.now();
         }
+        return useCachedData;
+    }
+    async function retrieveMeteodataWithGeolocation(): Promise<void> {
+        isUpdatingMeteoData = true;
+        const options = {
+            enableHighAccuracy: false,
+            timeout: Infinity, // No timeout
+            maximumAge: 0, // No cache
+        };
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+                const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&timezone=${tz}&current=temperature_2m&daily=temperature_2m_max,temperature_2m_min&forecast_days=1`;
+                axios.get(url).then((r) => {
+                    let data = r.data;
+                    currTemp = data.current.temperature_2m;
+                    currUnit = data.current_units.temperature_2m;
+                    todayMaxTemp = data.daily.temperature_2m_max[0];
+                    todayMinTemp = data.daily.temperature_2m_min[0];
+                    todayUnit = data.daily_units.temperature_2m_max;
+
+                    setMeteoCacheToStorage({
+                        createdAt: Date.now(),
+                        currTemp: currTemp,
+                        currUnit: currUnit,
+                        todayMaxTemp: todayMaxTemp,
+                        todayMinTemp: todayMinTemp,
+                        todayUnit: todayUnit,
+                    }).then(() => {
+                        isUpdatingMeteoData = false;
+                    });
+                });
+            },
+            () => {
+                addNotification({
+                    message: "Couldn't retrieve geolocation data, unable to get meteo data",
+                    status: NotificationStatus.Error,
+                });
+            },
+            options,
+        );
+    }
+    async function getMeteoData() {
+        const useCachedData = await retrieveCachedMeteoData();
         if (useCachedData) {
             return;
         }
         if (navigator.geolocation) {
-            const options = {
-                enableHighAccuracy: false,
-                timeout: Infinity, // No timeout
-                maximumAge: 0, // No cache
-            };
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const latitude = position.coords.latitude;
-                    const longitude = position.coords.longitude;
-                    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-                    const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&timezone=${tz}&current=temperature_2m&daily=temperature_2m_max,temperature_2m_min&forecast_days=1`;
-                    axios.get(url).then((r) => {
-                        let data = r.data;
-                        currTemp = data.current.temperature_2m;
-                        currUnit = data.current_units.temperature_2m;
-                        todayMaxTemp = data.daily.temperature_2m_max[0];
-                        todayMinTemp = data.daily.temperature_2m_min[0];
-                        todayUnit = data.daily_units.temperature_2m_max;
-
-                        setMeteoCacheToStorage({
-                            createdAt: Date.now(),
-                            currTemp: currTemp,
-                            currUnit: currUnit,
-                            todayMaxTemp: todayMaxTemp,
-                            todayMinTemp: todayMinTemp,
-                            todayUnit: todayUnit,
-                        }).then(() => {
-                            isUpdatingMeteoData = false;
-                        });
-                    });
-                },
-                (error) => {
-                    console.error("Error getting location: ", error);
-                },
-                options,
-            );
+            await retrieveMeteodataWithGeolocation();
         } else {
-            console.log("Geolocation is not supported by this browser.");
+            addNotification({
+                message: "Geolocation is not supported by this browser.",
+                status: NotificationStatus.Error,
+            });
         }
     }
 
@@ -93,7 +106,7 @@
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 stroke-width="1.5"
-                stroke="#E84545"
+                stroke={currTemp ? "#E84545" :  "currentColor"}
                 width="1rem"
                 height="1rem"
             >
@@ -112,7 +125,7 @@
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 stroke-width="1.5"
-                stroke="#256fff"
+                stroke={currTemp ? "#256fff" :  "currentColor"}
                 width="1rem"
                 height="1rem"
             >
@@ -125,9 +138,12 @@
         </span>
         <span>{min}</span>
     </span>
-    {#if isUpdatingMeteoData}
+    {#if isUpdatingMeteoData && currTemp}
         <div class="spinner is-inline-block ml-1"></div>
-        <Tooltip tooltipText="Meteo data are outdated, udate is ongoing" position="bottom"><QuestionMarkIcon/></Tooltip>
+        <Tooltip
+            tooltipText="Meteo data are outdated, udate is ongoing"
+            position="bottom"><QuestionMarkIcon /></Tooltip
+        >
     {/if}
 </div>
 
