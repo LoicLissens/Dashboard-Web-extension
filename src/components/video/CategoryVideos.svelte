@@ -11,7 +11,7 @@
 
 {#if channels.length > 0}
   <Expander title={category} {expanded}>
-    {#each channels as channel}
+    {#each channels as channel (channel.channelId)}
       <VideoPlayer {channel} />
     {/each}
   </Expander>

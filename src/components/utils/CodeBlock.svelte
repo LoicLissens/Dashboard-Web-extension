@@ -1,7 +1,6 @@
 <script lang="ts">
     import hljs from "highlight.js/lib/core";
     import json from "highlight.js/lib/languages/json";
-    // import "highlight.js/styles/atom-one-dark.css";
     import { onMount } from "svelte";
 
     export let code: string;
