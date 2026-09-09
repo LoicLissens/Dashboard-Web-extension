@@ -37,16 +37,12 @@
     };
 </script>
 
-<div class="file is-inline-block is-link">
-    <label class="file-label">
-        <input
-            class="file-input"
-            type="file"
-            accept="application/JSON"
-            on:change={uploadConfig}
-        />
-        <span class="file-cta">
-            <span class="file-label"> Upload Config </span>
-        </span>
-    </label>
-</div>
+<!-- daisyUI puts `file-input` directly on the input; Bulma's
+     file/file-label/file-cta wrappers are gone. -->
+<input
+    class="file-input file-input-primary"
+    type="file"
+    accept="application/JSON"
+    aria-label="Upload config"
+    on:change={uploadConfig}
+/>

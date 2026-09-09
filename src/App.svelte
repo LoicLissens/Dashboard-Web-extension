@@ -17,10 +17,17 @@
 </script>
 
 <Navbar />
-<main class="is-flex is-justify-content-center">
-  {#each notificationsList as notification (notification.id)}
-    <Notification {notification} />
-  {/each}
+<!-- pt-16 clears the fixed navbar (min-h-16), which Bulma's
+     `has-navbar-fixed-top` body class used to handle. -->
+<main class="flex justify-center pt-16">
+  <!-- One `toast` container for all notifications so they stack and flow.
+       Previously each Notification positioned itself fixed at top:0/right:0,
+       so they all piled up at the same coordinates. -->
+  <div class="toast toast-top toast-end z-50">
+    {#each notificationsList as notification (notification.id)}
+      <Notification {notification} />
+    {/each}
+  </div>
   <Sidebar currentPage={state} on:changePage={(e) => (state = e.detail)} />
   {#if state === Page.HOME}
     <General />
@@ -31,7 +38,7 @@
 
 <style>
   main {
-    height: 100vh;
+    min-height: 100vh;
     width: 100vw;
   }
 </style>

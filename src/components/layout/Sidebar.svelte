@@ -10,36 +10,37 @@
   const dispatch = createEventDispatcher<{ changePage: Page }>();
 </script>
 
-<aside class="box is-flex is-justify-content-center is-align-items-center box">
-  <nav>
+<aside
+  class="fixed left-[1%] top-[15vh] flex flex-col items-center bg-base-100 rounded-box shadow-md p-2"
+>
+  <nav class="w-full">
     <Divider />
-    <ul>
+    <ul class="menu menu-vertical gap-2 p-0">
       <li>
-        <button on:click={() => dispatch("changePage", Page.HOME)}>
-         <HomeIcon isFocused={currentPage == Page.HOME} size={IconSize.Medium} />
+        <button
+          class:menu-active={currentPage === Page.HOME}
+          aria-current={currentPage === Page.HOME ? "page" : undefined}
+          on:click={() => dispatch("changePage", Page.HOME)}
+        >
+          <HomeIcon
+            isFocused={currentPage === Page.HOME}
+            size={IconSize.Medium}
+          />
         </button>
       </li>
       <li>
-        <button on:click={() => dispatch("changePage", Page.VIDEOS)}>
-          <VideoIcon isFocused={currentPage == Page.VIDEOS} size={IconSize.Medium} />
+        <button
+          class:menu-active={currentPage === Page.VIDEOS}
+          aria-current={currentPage === Page.VIDEOS ? "page" : undefined}
+          on:click={() => dispatch("changePage", Page.VIDEOS)}
+        >
+          <VideoIcon
+            isFocused={currentPage === Page.VIDEOS}
+            size={IconSize.Medium}
+          />
         </button>
       </li>
     </ul>
     <Divider />
   </nav>
 </aside>
-
-<style>
-  aside {
-    position: fixed;
-    left: 1%;
-    top: 15vh;
-    border-radius: 5px;
-    height: 70vh;
-  }
-  li {
-    cursor: pointer;
-    list-style: none;
-    padding-left: 0;
-  }
-</style>

@@ -12,13 +12,15 @@
     });
 </script>
 
-<pre>
-    <code bind:this={ref} class="language-json">{code}</code>
-</pre>
+<pre class="bg-base-300 text-base-content rounded p-2 overflow-x-auto"><code
+        bind:this={ref}
+        class="language-json font-mono whitespace-pre">{code}</code></pre>
 
 <style>
+    /* highlight.js injects these spans at runtime, so Svelte's scoping would
+       strip the rules -- hence :global(). */
     :global(.hljs-string) {
-        color: #2aa198;;
+        color: #2aa198;
     }
 
     :global(.hljs-number) {
@@ -27,14 +29,5 @@
 
     :global(.hljs-attr) {
         color: #b58900;
-    }
-    pre {
-        background-color:  #282c34;
-        border-radius: 4px;
-        padding: 0px;
-    }
-    code {
-        font-family: monospace;
-        overflow: auto;
     }
 </style>

@@ -9,6 +9,6 @@
 {#if isModalActive}
     <SettingsModal {isModalActive} on:closeModal={() => isModalActive = false } />
 {/if}
-<button on:click={setModal}>
+<button class="btn btn-ghost btn-circle" aria-label="Open settings" on:click={setModal}>
     <SettingsIcon/>
 </button>

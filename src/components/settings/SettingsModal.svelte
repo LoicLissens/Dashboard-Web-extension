@@ -18,7 +18,7 @@
 </script>
 
 <Modal {isModalActive} on:closeModal={closeModal}>
-    <div style="height: 70vh;">
+    <div class="h-[70vh] overflow-y-auto">
         <SettingsTabs
             {activeTab}
             on:changeTab={(e) => (activeTab = e.detail)}

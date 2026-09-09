@@ -21,29 +21,29 @@
   }
 </script>
 
-<Modal {isModalActive}>
-  <h1 class="title has-text-grey has-text-centered">Register your name</h1>
+<Modal {isModalActive} dismissible={false}>
+  <h1 class="text-2xl font-bold text-center text-base-content/60">Register your name</h1>
   <form
     on:submit|preventDefault={setName}
-    class="is-flex is-justify-content-center mb-4"
+    class="flex justify-center items-center gap-2 mb-4"
   >
-    <div class="control">
+    <div>
       <input
         name="name"
         type="text"
         placeholder="Name"
-        class="input {isDanger ? 'is-danger' : ''}"
+        class="input input-bordered {isDanger ? 'input-error' : ''}"
       />
     </div>
-    <button class="button is-primary is-outlined has-text-grey ml-2">
+    <button class="btn btn-primary btn-outline">
       Register Name
     </button>
   </form>
   <Divider />
-  <h2 class="title has-text-grey has-text-centered">
+  <h2 class="text-xl font-bold text-center text-base-content/60">
     Or configure from a config file
   </h2>
-  <div class="is-flex is-justify-content-center">
+  <div class="flex justify-center">
     <ConfigFileUploader />
   </div>
 </Modal>

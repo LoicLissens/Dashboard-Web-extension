@@ -86,24 +86,25 @@
 
 <div>
     <!-- TODO Refactor if/else, It suck this way I think AND MAKE A COMPONENT-->
-    <h4 class="title is-4 has-text-grey my-2">
+    <h4 class="text-2xl font-bold text-base-content/60 my-2">
         Youtube API Key
     </h4>
     {#if ytApiKey}
         <form on:submit|preventDefault={(e) => setApiKey(e)}>
-            <div class="is-flex">
+            <div class="flex items-center gap-2">
                 <div>
-                    <div class="control has-icons-right">
+                    <div class="relative inline-block">
                         <input
-                            class="input"
+                            class="input input-bordered pr-10"
                             type={showKey ? "text" : "password"}
                             value={ytApiKey}
                             disabled={isDisabled}
                             name="key"
                         />
-                        <!-- svelte-ignore a11y-click-events-have-key-events -->
-                        <span
-                            class="icon is-right is-clickable"
+                        <button
+                            type="button"
+                            class="absolute right-2 top-1/2 -translate-y-1/2"
+                            aria-label={showKey ? "Hide API key" : "Show API key"}
                             on:click={() => (showKey = !showKey)}
                         >
                             {#if !showKey}
@@ -111,45 +112,44 @@
                             {:else}
                                 <HideIcon size={IconSize.Small}/>
                             {/if}
-                        </span>
+                        </button>
                     </div>
                 </div>
-                <!-- svelte-ignore a11y-click-events-have-key-events -->
-                <span
-                    class="icon is-align-self-center"
+                <button
+                    type="button"
+                    class="self-center"
+                    aria-label="Edit API key"
                     on:click={editApiKey}
                 >
                     <EditIcon isFocused={!isDisabled} size={IconSize.Medium}/>
-                </span>
+                </button>
             </div>
         </form>
     {:else}
         <form on:submit|preventDefault={(e) => setApiKey(e)}>
-            <div class="field">
-                <div class="control">
-                    <input
-                        class="input"
-                        name="key"
-                        type="text"
-                        placeholder="Add a Youtube API key"
-                    />
-                </div>
-            </div>
+            <input
+                class="input input-bordered w-full max-w-xs"
+                name="key"
+                type="text"
+                placeholder="Add a Youtube API key"
+            />
         </form>
     {/if}
     <!--Catergory part-->
     <div>
-        <h4 class="title is-4 has-text-grey my-2">
+        <h4 class="text-2xl font-bold text-base-content/60 my-2">
             Categories
         </h4>
         <div>
             {#if categories}
-                <div class="tags">
+                <div class="flex flex-wrap gap-1">
                     {#each categories as category}
                         <!--TODO Add delete action and try to retregger component if something change in the settings-->
-                        <span class="tag mr-1"
-                            >{category}<button class="delete is-small"
-                            ></button></span
+                        <span class="badge gap-1"
+                            >{category}<button
+                                class="btn btn-xs btn-circle btn-ghost"
+                                aria-label={`Delete category ${category}`}
+                            >✕</button></span
                         >
                     {/each}
                 </div>
@@ -157,7 +157,7 @@
         </div>
     </div>
     <div>
-        <h4 class="title is-4 title has-text-grey my-2">
+        <h4 class="text-2xl font-bold text-base-content/60 my-2">
             Channels
         </h4>
         <div>
@@ -169,10 +169,15 @@
                             {/if}
                             <div>
                                 Name : {channel.name}
-                                <button class="delete" on:click={() => deleteChannel(channel.channelId)}></button>
+                                <button
+                                    class="btn btn-xs btn-circle btn-ghost"
+                                    aria-label={`Delete channel ${channel.name}`}
+                                    on:click={() => deleteChannel(channel.channelId)}
+                                >✕</button>
                             </div>
                             <div>
                                 Number of video to retrieve : <input
+                                    class="input input-bordered input-sm w-20"
                                     type="number"
                                     min="1"
                                     max="5"
@@ -187,7 +192,11 @@
                             <div class="mb-2">
                                 Hidden videos :
                                 {#each channel.hiddenVideos as video}
-                                        {video.title} <button class="delete" on:click={()=>deleteHiddenVideo(video.id,channel.channelId)}></button>
+                                        {video.title} <button
+                                            class="btn btn-xs btn-circle btn-ghost"
+                                            aria-label={`Unhide ${video.title}`}
+                                            on:click={()=>deleteHiddenVideo(video.id,channel.channelId)}
+                                        >✕</button>
                                 {/each}
                             </div>
                     {/each}

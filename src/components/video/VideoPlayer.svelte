@@ -52,40 +52,42 @@
     }
 </script>
 
-<div class="box channelbox block">
-    <div class="is-flex mb-2">
-        <figure class="image is-48x48">
-            <img
-                class="is-rounded"
-                src={channel.defaultAvatrUrl}
-                alt="Channel avatar"
-            />
-        </figure>
-        <p
-            class="is-flex is-align-items-center ml-2 is-underlined has-text-weight-semibold has-text-primary-dark"
-        >
-            {channel.name}
-        </p>
-    </div>
-    {#await fetchLastVideos(channel.uploadPlaylistId)}
-        <p>Loading...</p>
-    {:then}
-        {#each videos as video, i (i)}
-            {#if !hiddenVideosId.includes(video.id)}
-                <figure class="image is-16by9">
+<div class="card bg-base-100 shadow-md mb-4">
+    <div class="card-body gap-2">
+        <div class="flex items-center gap-2">
+            <figure class="size-12 shrink-0">
+                <img
+                    class="rounded-full"
+                    src={channel.defaultAvatrUrl}
+                    alt="Channel avatar"
+                />
+            </figure>
+            <p class="underline font-semibold text-primary">
+                {channel.name}
+            </p>
+        </div>
+        {#await fetchLastVideos(channel.uploadPlaylistId)}
+            <span class="loading loading-spinner"></span>
+        {:then}
+            {#each videos as video, i (i)}
+                {#if !hiddenVideosId.includes(video.id)}
                     <iframe
                         title={video.title}
-                        class="has-ratio"
+                        class="aspect-video w-full rounded"
                         src="https://www.youtube.com/embed/{video.id}"
                         frameborder="0"
                         allowfullscreen
                     ></iframe>
-                </figure>
-                <label class="checkbox">
-                    <input type="checkbox" on:change={() => hideVideo(video)} />
-                    Hide this video
-                </label>
-            {/if}
-        {/each}
-    {/await}
+                    <label class="label cursor-pointer justify-start gap-2">
+                        <input
+                            type="checkbox"
+                            class="checkbox checkbox-sm"
+                            on:change={() => hideVideo(video)}
+                        />
+                        <span>Hide this video</span>
+                    </label>
+                {/if}
+            {/each}
+        {/await}
+    </div>
 </div>

@@ -112,114 +112,106 @@
   });
 </script>
 
-<section class="section">
-  <div class="container">
-    <div class="box">
-      <h2 class="title is-4 has-text-primary">Today's Tasks</h2>
+<section class="py-8">
+  <div class="container mx-auto">
+    <div class="card bg-base-100 shadow-md">
+      <div class="card-body">
+        <h2 class="text-2xl font-bold text-primary">Today's Tasks</h2>
 
-      {#if errorMessage}
-        <div class="notification is-danger is-light" transition:fade>
-          <button class="delete" on:click={() => (errorMessage = "")}></button>
-          {errorMessage}
-        </div>
-      {/if}
-
-      {#if successMessage}
-        <div class="notification is-success is-light" transition:fade>
-          <button class="delete" on:click={() => (successMessage = "")}
-          ></button>
-          {successMessage}
-        </div>
-      {/if}
-
-      <div class="block">
-        <div class="field is-grouped is-grouped-multiline">
-          <div class="control is-expanded">
-            <input
-              bind:value={newTask.label}
-              placeholder="What needs to be done?"
-              type="text"
-              class="input"
-              on:keypress={(e) =>
-                e.key === "Enter" && !disabledButton && addTask()}
-            />
-          </div>
-          <div class="control">
-            <input
-              type="time"
-              bind:value={newTask.hour}
-              min="00:00"
-              max="23:59"
-              class="input"
-              placeholder="Time"
-            />
-          </div>
-          <div class="control">
+        {#if errorMessage}
+          <div class="alert alert-error alert-soft" transition:fade>
+            <span>{errorMessage}</span>
             <button
-              class="button is-primary {isLoading ? 'is-loading' : ''}"
-              disabled={disabledButton}
-              on:click={addTask}
+              class="btn btn-sm btn-circle btn-ghost"
+              aria-label="Dismiss error"
+              on:click={() => (errorMessage = "")}>✕</button
             >
-              <span>Add Task</span>
-            </button>
           </div>
+        {/if}
+
+        {#if successMessage}
+          <div class="alert alert-success alert-soft" transition:fade>
+            <span>{successMessage}</span>
+            <button
+              class="btn btn-sm btn-circle btn-ghost"
+              aria-label="Dismiss message"
+              on:click={() => (successMessage = "")}>✕</button
+            >
+          </div>
+        {/if}
+
+        <div class="flex flex-wrap items-center gap-2 mb-4">
+          <input
+            bind:value={newTask.label}
+            placeholder="What needs to be done?"
+            type="text"
+            class="input input-bordered flex-1 min-w-48"
+            on:keypress={(e) =>
+              e.key === "Enter" && !disabledButton && addTask()}
+          />
+          <input
+            type="time"
+            bind:value={newTask.hour}
+            min="00:00"
+            max="23:59"
+            class="input input-bordered"
+            placeholder="Time"
+          />
+          <button
+            class="btn btn-primary"
+            disabled={disabledButton}
+            on:click={addTask}
+          >
+            {#if isLoading}
+              <span class="loading loading-spinner"></span>
+            {/if}
+            <span>Add Task</span>
+          </button>
         </div>
-      </div>
 
-      {#if taskCount > 0}
-        <div class="content">
-          <div class="level is-mobile mb-2">
-            <div class="level-left">
-              <div class="level-item">
-                <span class="tag is-info is-light">
-                  {completedTaskCount}/{taskCount} completed
-                </span>
-              </div>
-            </div>
-            <div class="level-right">
-              <div class="level-item">
-                <progress
-                  class="progress is-primary is-small"
-                  value={completedTaskCount}
-                  max={taskCount}
-                >
-                  {Math.round((completedTaskCount / taskCount) * 100)}%
-                </progress>
-              </div>
-            </div>
-          </div>
-
-          <div class="task-list">
-            {#each sortedTasks as task (task.label)}
-              <div
-                class="box task-item mb-2 pt-3 pb-3"
-                class:has-background-success-light={task.done}
-                transition:slide
+        {#if taskCount > 0}
+          <div>
+            <div class="flex justify-between items-center gap-4 mb-2">
+              <span class="badge badge-info badge-soft">
+                {completedTaskCount}/{taskCount} completed
+              </span>
+              <progress
+                class="progress progress-primary w-56"
+                value={completedTaskCount}
+                max={taskCount}
               >
-                <div class="columns is-mobile is-vcentered">
-                  <div class="column is-narrow">
-                    <label class="checkbox">
-                      <input
-                        type="checkbox"
-                        bind:checked={task.done}
-                        on:change={updateTask}
-                      />
-                    </label>
-                  </div>
-                  <div class="column is-narrow">
-                    <span class="tag is-info is-light">{task.hour}</span>
-                  </div>
-                  <div class="column">
+                {Math.round((completedTaskCount / taskCount) * 100)}%
+              </progress>
+            </div>
+
+            <div class="task-list">
+              {#each sortedTasks as task (task.label)}
+                <div
+                  class="card mb-2 transition-colors {task.done
+                    ? 'bg-success/20'
+                    : 'bg-base-200'}"
+                  transition:slide
+                >
+                  <div class="card-body flex-row items-center gap-3 py-3">
+                    <input
+                      type="checkbox"
+                      class="checkbox shrink-0"
+                      aria-label="Mark task done"
+                      bind:checked={task.done}
+                      on:change={updateTask}
+                    />
+                    <span class="badge badge-info badge-soft shrink-0"
+                      >{task.hour}</span
+                    >
                     <span
-                      class:has-text-grey-light={task.done}
-                      class:has-text-decoration-line-through={task.done}
+                      class="flex-1 {task.done
+                        ? 'line-through text-base-content/40'
+                        : ''}"
                     >
                       {task.label}
                     </span>
-                  </div>
-                  <div class="column is-narrow">
                     <button
-                      class="button is-small is-danger is-light"
+                      class="btn btn-sm btn-error btn-soft shrink-0"
                       on:click={() => removeTask(task.label)}
                       title="Delete task"
                     >
@@ -227,61 +219,25 @@
                     </button>
                   </div>
                 </div>
-              </div>
-            {/each}
+              {/each}
+            </div>
           </div>
-        </div>
-      {:else}
-        <div class="notification is-light has-text-centered p-5">
-          <p class="is-size-5">
-            No tasks for today! Add your first task above.
-          </p>
-        </div>
-      {/if}
+        {:else}
+          <div class="alert text-center p-5">
+            <p class="text-lg">
+              No tasks for today! Add your first task above.
+            </p>
+          </div>
+        {/if}
+      </div>
     </div>
   </div>
 </section>
 
 <style>
-  .task-item {
-    transition: background-color 0.3s ease;
-  }
-
-  .has-text-decoration-line-through {
-    text-decoration: line-through;
-  }
-
   .task-list {
     max-height: 500px;
     overflow-y: auto;
-  }
-
-  /* Optional: Customize scrollbar */
-  .task-list::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  .task-list::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
-  }
-
-  .task-list::-webkit-scrollbar-thumb {
-    background: #dbdbdb;
-    border-radius: 4px;
-  }
-
-  .task-list::-webkit-scrollbar-thumb:hover {
-    background: #b5b5b5;
-  }
-
-  /* Add custom delete button styling to be more distinct */
-  .button.is-danger.is-light {
-    transition: all 0.2s ease;
-  }
-
-  .button.is-danger.is-light:hover {
-    background-color: #f14668;
-    color: white;
+    scrollbar-width: thin;
   }
 </style>

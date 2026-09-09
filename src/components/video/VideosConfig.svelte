@@ -73,23 +73,26 @@
     }}
     on:closeModal={closeModal}
 />
-<div class="my-3 box">
-    <h2 class="has-text-centered">
+<div class="my-3 card bg-base-100 shadow-md"><div class="card-body">
+    <h2 class="text-center">
         Enter an URL channel to get lasts videos.<Tooltip {tooltipText}>
             <QuestionMarkIcon />
         </Tooltip>
     </h2>
-    <div class="is-inline-flex">
-        <div class="control {isAddingChannel && 'is-loading'}">
+    <div class="flex flex-wrap items-center gap-2">
+        <div class="flex items-center gap-2">
             <input
                 bind:value={channelURL}
                 placeholder="Channel URL"
                 type="text"
-                class="input {isError && 'is-danger'}"
+                class="input input-bordered {isError ? 'input-error' : ''}"
             />
+            {#if isAddingChannel}
+                <span class="loading loading-spinner loading-sm"></span>
+            {/if}
         </div>
-        <div class="select px-2">
-            <select
+        <select
+                class="select select-bordered"
                 bind:value={categoryChannel}
                 name="pets"
                 id="category-select"
@@ -99,20 +102,18 @@
                     <option value={category}>{category}</option>
                 {/each}
             </select>
-        </div>
         <button
-            class="button is-primary is-outlined has-text-grey"
+            class="btn btn-primary btn-outline"
             disabled={isAddingChannel || !categoryChannel || !channelURL}
             on:click={() => storeChannelInfo(channelURL, categoryChannel)}
         >
-            <span class="icon">
+            <span class="inline-flex items-center justify-center size-5">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke-width="1.5"
                     stroke="currentColor"
-                    class="w-6 h-6"
                 >
                     <path
                         stroke-linecap="round"
@@ -124,10 +125,11 @@
             <span>Register a channel</span>
         </button>
     </div>
-    <div class="has-text-centered mt-2">
+    <div class="text-center mt-2">
         <button
-            class="button is-link is-outlined"
+            class="btn btn-link btn-outline"
             on:click={() => (isModalActive = true)}>Add categories</button
         >
     </div>
+</div>
 </div>

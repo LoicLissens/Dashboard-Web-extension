@@ -1,0 +1,28 @@
+/*
+ * Tailwind + daisyUI entry point.
+ *
+ * Built by the Tailwind CLI (see the `build:css` / `dev:css` npm scripts) into
+ * public/build/tailwind.css, which public/index.html links. It is deliberately
+ * NOT imported from main.ts: rollup-plugin-css-only concatenates CSS without
+ * running PostCSS, so Tailwind's directives would never be processed.
+ *
+ * Consequence: component <style> blocks cannot use @apply or theme(). Use
+ * utility classes in markup instead.
+ */
+
+/* `source(none)` disables automatic detection so scanning is explicit and
+   never reaches public/build/bundle.js, whose compiled output would otherwise
+   produce phantom class matches. */
+@import "tailwindcss" source(none);
+
+@source "../src/**/*.svelte";
+@source "../public/index.html";
+
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark;
+}
+
+/* Backdrop blur for the modal overlay. Was public/global.css. */
+.blur {
+  backdrop-filter: blur(5px);
+}

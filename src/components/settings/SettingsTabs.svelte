@@ -17,20 +17,27 @@
     export let activeTab: Tab;
 </script>
 
-<div class="tabs is-small">
-    <ul>
-        <li class={activeTab === Tab.General ? "is-active" : ""}>
-            <button type="button" on:click={() => dispatch("changeTab", Tab.General)}>
-                <GeneralIcon size={IconSize.Base} /> General
-            </button>
-        </li>
-        <li class={activeTab === Tab.Videos ? "is-active" : ""}>
-            <button type="button" on:click={() => dispatch("changeTab", Tab.Videos)}>
-                <span class="icon">
-                    <VideoIcon size={IconSize.Base} isFocused={false} />
-                </span>Videos
-            </button>
-        </li>
-    </ul>
-    <kbd class="key">esc</kbd>
+<!-- daisyUI tabs are flat: the ul/li wrapper Bulma required is gone. -->
+<div class="flex items-center justify-between">
+    <div role="tablist" class="tabs tabs-border tabs-sm">
+        <button
+            role="tab"
+            type="button"
+            class="tab gap-1"
+            class:tab-active={activeTab === Tab.General}
+            on:click={() => dispatch("changeTab", Tab.General)}
+        >
+            <GeneralIcon size={IconSize.Small} /> General
+        </button>
+        <button
+            role="tab"
+            type="button"
+            class="tab gap-1"
+            class:tab-active={activeTab === Tab.Videos}
+            on:click={() => dispatch("changeTab", Tab.Videos)}
+        >
+            <VideoIcon size={IconSize.Small} isFocused={false} /> Videos
+        </button>
+    </div>
+    <kbd class="kbd kbd-sm">esc</kbd>
 </div>

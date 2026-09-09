@@ -28,11 +28,9 @@
 </script>
 
 <RegisterModal isModalActive={!name} on:setName={e => setName(e.detail.name)} />
-<div class="navbar-item">
-  <p class="mx-2">{msToDate($date)}</p>
+<div class="flex items-center gap-2">
+  <p class="text-sm text-base-content/60">{msToDate($date)}</p>
   {#if name}
-    <div>
-      <p>{greeting($date)} {name}</p>
-    </div>
+    <p class="font-semibold">{greeting($date)} {name}</p>
   {/if}
-  </div>
+</div>
