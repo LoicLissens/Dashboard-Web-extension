@@ -1,6 +1,5 @@
 <script lang="ts">
     import BaseIcon from "./BaseIcon.svelte";
-    import { type IconSize } from "./BaseIcon.svelte";
 </script>
 
 <BaseIcon scaleOnHover={true}>

@@ -5,10 +5,9 @@
   import Divider from "../utils/Divider.svelte";
   import HomeIcon from "../icons/HomeIcon.svelte";
   import VideoIcon from "../icons/VideoIcon.svelte";
-  import Home from "../../views/Home.svelte";
 
   export let currentPage: Page;
-  const dispatch = createEventDispatcher();
+  const dispatch = createEventDispatcher<{ changePage: Page }>();
 </script>
 
 <aside class="box is-flex is-justify-content-center is-align-items-center box">

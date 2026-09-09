@@ -8,7 +8,7 @@
 
     export let isModalActive: boolean;
 
-    const dispatch = createEventDispatcher();
+    const dispatch = createEventDispatcher<{ closeModal: never }>();
 
     let activeTab: Tab = Tab.General;
 
@@ -23,9 +23,9 @@
             {activeTab}
             on:changeTab={(e) => (activeTab = e.detail)}
         />
-        {#if activeTab === "general"}
+        {#if activeTab === Tab.General}
             <GeneralSettings />
-        {:else if activeTab === "videos"}
+        {:else if activeTab === Tab.Videos}
             <VideoSettings />
         {/if}
     </div>

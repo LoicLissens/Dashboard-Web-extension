@@ -8,9 +8,10 @@
     import Tooltip from "./utils/Tooltip.svelte";
     import QuestionMarkIcon from "./icons/QuestionMarkIcon.svelte";
     import { addNotification, NotificationStatus } from "../store/store";
+    import { type OpenMeteoForecastResponse } from "../services/types";
 
     let currTemp: number;
-    let currUnit: number;
+    let currUnit: string;
     let todayMaxTemp: number;
     let todayMinTemp: number;
     let todayUnit: string;
@@ -50,7 +51,7 @@
                 const longitude = position.coords.longitude;
                 const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                 const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&timezone=${tz}&current=temperature_2m&daily=temperature_2m_max,temperature_2m_min&forecast_days=1`;
-                axios.get(url).then((r) => {
+                axios.get<OpenMeteoForecastResponse>(url).then((r) => {
                     let data = r.data;
                     currTemp = data.current.temperature_2m;
                     currUnit = data.current_units.temperature_2m;
@@ -92,7 +93,7 @@
     });
 </script>
 
-<div class={!currTemp && "is-skeleton"}>
+<div class={!currTemp ? "is-skeleton" : ""}>
     <span>{curr}</span>
     <span>
         <span class="icon">

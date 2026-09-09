@@ -5,9 +5,6 @@
         setFullConfigToStorage,
     } from "../../helpers/manageStorage";
     import { addNotification, NotificationStatus } from "../../store/store";
-    interface ParsedData {
-        [key: string]: any;
-    }
 
     const uploadConfig = (e: Event): void => {
         const input = e.target as HTMLInputElement;
@@ -23,7 +20,7 @@
         reader.onload = async function (e: ProgressEvent<FileReader>) {
             try {
                 const content = e.target?.result as string;
-                const parsedData: ParsedData = JSON.parse(content);
+                const parsedData: unknown = JSON.parse(content);
                 const userConfig = validateUserConfig(parsedData);
                 await clearStorage();
                 await setFullConfigToStorage(userConfig);

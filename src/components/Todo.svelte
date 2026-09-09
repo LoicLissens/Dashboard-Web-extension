@@ -10,7 +10,7 @@
   import { fade, slide } from "svelte/transition";
 
   let newTask: Task = {
-    label: undefined,
+    label: "",
     hour: undefined,
     done: false,
   };
@@ -58,7 +58,7 @@
       showSuccess("Task added successfully!");
 
       newTask = {
-        label: undefined,
+        label: "",
         hour: undefined,
         done: false,
       };

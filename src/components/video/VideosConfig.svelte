@@ -22,7 +22,7 @@
     let isError = false;
     let isModalActive = categories.length === 0;
 
-    const dispatch = createEventDispatcher();
+    const dispatch = createEventDispatcher<{ channelRegistered: Channels }>();
     const tooltipText = "Eg: https://www.youtube.com/@grafikart";
 
     function closeModal() {

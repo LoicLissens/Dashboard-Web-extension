@@ -16,14 +16,14 @@
     async function fetchLastVideos(uploadPlaylistId: string) {
         const getItemsFromPlaylist =
             await youtubeAPI.getPlaylistItems(uploadPlaylistId);
+        const items = getItemsFromPlaylist.data.items ?? [];
         for (let i = 0; i <= channel.nbVideoToRetrieve - 1; i++) {
+            const item = items[i];
+            if (!item) break;
             let video: Video = {
-                title: getItemsFromPlaylist.data.items[i].snippet.title,
-                thumbnail:
-                    getItemsFromPlaylist.data.items[i].snippet.thumbnails.medium
-                        .url,
-                id: getItemsFromPlaylist.data.items[i].snippet.resourceId
-                    .videoId,
+                title: item.snippet.title,
+                thumbnail: item.snippet.thumbnails.medium.url,
+                id: item.snippet.resourceId.videoId,
             };
             if (!videos.map((e) => e.id).includes(video.id)) {
                 videos.push(video);

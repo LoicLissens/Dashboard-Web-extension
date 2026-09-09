@@ -15,7 +15,11 @@
     let categoryToRegister = "";
     let isDanger = false;
 
-    const dispatch = createEventDispatcher();
+    const dispatch = createEventDispatcher<{
+        closeModal: never;
+        categoryRegistered: Category;
+        categoryDeleted: Category;
+    }>();
 
     function closeModal() {
         isDanger = false;

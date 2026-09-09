@@ -12,24 +12,24 @@
 <script lang="ts">
     import { createEventDispatcher } from "svelte";
 
-    const dispatch = createEventDispatcher();
+    const dispatch = createEventDispatcher<{ changeTab: Tab }>();
 
     export let activeTab: Tab;
 </script>
 
 <div class="tabs is-small">
     <ul>
-        <li class={activeTab == Tab.General && "is-active"}>
-            <a href="#" on:click={() => dispatch("changeTab", "general")}>
-                <GeneralIcon  size="" /> General</a
-            >
+        <li class={activeTab === Tab.General ? "is-active" : ""}>
+            <button type="button" on:click={() => dispatch("changeTab", Tab.General)}>
+                <GeneralIcon size={IconSize.Base} /> General
+            </button>
         </li>
-        <li class={activeTab == Tab.Videos && "is-active"}>
-            <a href="#" on:click={() => dispatch("changeTab", "videos")}
-                ><span class="icon">
-                   <VideoIcon size="" isFocused={false} />
-                </span>Videos</a
-            >
+        <li class={activeTab === Tab.Videos ? "is-active" : ""}>
+            <button type="button" on:click={() => dispatch("changeTab", Tab.Videos)}>
+                <span class="icon">
+                    <VideoIcon size={IconSize.Base} isFocused={false} />
+                </span>Videos
+            </button>
         </li>
     </ul>
     <kbd class="key">esc</kbd>

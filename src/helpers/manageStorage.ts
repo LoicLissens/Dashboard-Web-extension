@@ -1,4 +1,3 @@
-// @ts-ignore
 import browser from "webextension-polyfill";
 import { z } from "zod";
 export enum StorageKeys {
@@ -21,7 +20,9 @@ export enum Page {
 }
 export interface Task {
     id?: string,
-    label?: string,
+    /** Also acts as the task's identity: used as the `{#each}` key and for
+     *  duplicate detection and removal, so it must always be present. */
+    label: string,
     hour?: string,
     done?: boolean,
 }
@@ -47,7 +48,7 @@ export interface Channel {
 export interface MeteoCache {
     createdAt: number,
     currTemp: number,
-    currUnit: number,
+    currUnit: string,
     todayMaxTemp: number,
     todayMinTemp: number,
     todayUnit:string
@@ -58,18 +59,18 @@ export type Categories = Array<Category>
 export type Channels = Array<Channel>
 export type Tasks = Array<Task>
 
-const OptionalUserConfigSchema = z.object({
+export const OptionalUserConfigSchema = z.object({
     categories: z.array(z.string()),
-    theme: z.enum(["light", "dark"]),
+    theme: z.nativeEnum(Theme),
     youtube: z.string().regex(/^[A-Za-z0-9_-]+$/, {
         message: "La clé API YouTube doit être au format valide"
     })
 }).partial()
-const UserConfigSchema = OptionalUserConfigSchema.extend({
+export const UserConfigSchema = OptionalUserConfigSchema.extend({
     configVersion: z.string(),
     name: z.string(),
 })
-type UserConfig = z.infer<typeof UserConfigSchema>;
+export type UserConfig = z.infer<typeof UserConfigSchema>;
 
 export function validateUserConfig(config: unknown): UserConfig {
     const result = UserConfigSchema.safeParse(config);
@@ -93,7 +94,7 @@ export const setTobrowserStorage = async (key: StorageKeys, payload: unknown): P
  * @param {string} key - the key to retrieve data
  * @returns {promise}
  */
-export const getFromBrowserStorage = async (key: StorageKeys): Promise<unknown | null> => {
+export const getFromBrowserStorage = async (key: StorageKeys): Promise<unknown> => {
     const prop = await browser.storage.local.get(key)
     return prop[key]
 

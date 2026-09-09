@@ -1,16 +1,18 @@
-<script>
+<script lang="ts">
   import { createEventDispatcher } from "svelte";
   import Modal from "./utils/Modal.svelte";
   import Divider from "./utils/Divider.svelte";
   import ConfigFileUploader from "./settings/ConfigFileUploader.svelte";
 
-  export let isModalActive = true;
+  export let isModalActive: boolean = true;
   let isDanger = false;
 
-  const dispatch = createEventDispatcher();
-  function setName(e) {
+  const dispatch = createEventDispatcher<{ setName: { name: string } }>();
+  function setName(e: Event & { currentTarget: HTMLFormElement }) {
     e.preventDefault();
-    const val = e.target.elements.name.value;
+    const val = (
+      e.currentTarget.elements.namedItem("name") as HTMLInputElement
+    ).value;
     if (!val) {
       isDanger = true;
       return;
@@ -30,7 +32,7 @@
         name="name"
         type="text"
         placeholder="Name"
-        class="input is-narrow {isDanger && 'is-danger'}"
+        class="input {isDanger ? 'is-danger' : ''}"
       />
     </div>
     <button class="button is-primary is-outlined has-text-grey ml-2">

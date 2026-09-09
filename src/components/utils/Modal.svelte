@@ -1,13 +1,13 @@
 <script lang="ts">
     import { onMount, onDestroy } from "svelte";
     import { createEventDispatcher } from "svelte";
-    import {clickOutside} from "../../helpers/clickOutside.js";
+    import {clickOutside} from "../../helpers/clickOutside";
 
     export let isModalActive: boolean;
 
     let keydownHandler:(evt: KeyboardEvent) => void;
 
-    const dispatch = createEventDispatcher();
+    const dispatch = createEventDispatcher<{ closeModal: never }>();
 
     function closeModal() {
         dispatch("closeModal")
@@ -25,7 +25,7 @@
         window.removeEventListener("keydown", keydownHandler);
     });
 </script>
-<div class="modal {isModalActive && 'is-active'}">
+<div class="modal {isModalActive ? 'is-active' : ''}">
     <div class="modal-background blur"></div>
     <div class="modal-content box"  use:clickOutside on:click_outside={closeModal}>
         <slot></slot>

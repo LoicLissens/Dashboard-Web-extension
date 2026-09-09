@@ -36,8 +36,10 @@
         ]);
     });
 
-    async function setApiKey(e:SubmitEvent) {
-        const apiKey = e.target.elements.key.value;
+    async function setApiKey(e: Event & { currentTarget: HTMLFormElement }) {
+        const apiKey = (
+            e.currentTarget.elements.namedItem("key") as HTMLInputElement
+        ).value;
         await setTobrowserStorage(StorageKeys.YOUTUBEAPIKEY, apiKey);
         youtubeAPI.setAPIKey(apiKey);
         ytApiKey = apiKey;
@@ -45,8 +47,11 @@
         showKey = false;
     }
 
-    async function setNBVideoToRetrieve(e, channelId:string) {
-        const nbVideo = e.target!.value;
+    async function setNBVideoToRetrieve(
+        e: Event & { currentTarget: HTMLInputElement },
+        channelId: string,
+    ) {
+        const nbVideo = Number(e.currentTarget.value);
         const index = channels.findIndex(
             (channel) => channel.channelId === channelId,
         );
@@ -164,7 +169,7 @@
                             {/if}
                             <div>
                                 Name : {channel.name}
-                                <button class="delete" on:click={deleteChannel(channel.channelId)}></button>
+                                <button class="delete" on:click={() => deleteChannel(channel.channelId)}></button>
                             </div>
                             <div>
                                 Number of video to retrieve : <input
