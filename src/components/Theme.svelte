@@ -3,28 +3,38 @@
     import {getFromBrowserStorage,StorageKeys,setTobrowserStorage, Theme} from "../helpers/manageStorage"
     import ThemeIcon from "./icons/ThemeIcon.svelte";
 
-    let theme:Theme;
-    const changeTheme = (them: Theme) => {
-        const  htmlElement = document.querySelector('html') as HTMLElement;
-        htmlElement.setAttribute('data-theme', theme);
+    let theme: Theme;
+
+    const applyTheme = (next: Theme) => {
+        document.documentElement.setAttribute('data-theme', next);
+        // Mirrored so the inline script in index.html can apply the theme
+        // before first paint; chrome.storage is async and too late for that.
+        // chrome.storage remains the source of truth for config export/import.
+        try {
+            localStorage.setItem(StorageKeys.THEME, next);
+        } catch (e) {
+            // Storage can be unavailable (private mode, blocked site data).
+            // The theme still applies for this session.
+        }
     }
     const toggleTheme = () => {
         theme = theme === Theme.DARK ? Theme.LIGHT : Theme.DARK;
         setTobrowserStorage(StorageKeys.THEME, theme);
-        changeTheme(theme);
+        applyTheme(theme);
     };
     onMount(async() => {
-        const registeredTheme= await getFromBrowserStorage(StorageKeys.THEME);
+        const registeredTheme = await getFromBrowserStorage(StorageKeys.THEME);
         if (registeredTheme) {
             theme = registeredTheme as Theme;
-            changeTheme(theme);
+            applyTheme(theme);
             return;
         }
         const systemtThemeIsDark = window.matchMedia(`(prefers-color-scheme: ${Theme.DARK})`).matches;
         theme = systemtThemeIsDark ? Theme.DARK : Theme.LIGHT;
+        applyTheme(theme);
     });
 </script>
 
-<button on:click={()=> toggleTheme()}>
+<button class="btn btn-ghost btn-circle" aria-label="Toggle theme" on:click={() => toggleTheme()}>
     <ThemeIcon theme={theme}/>
 </button>

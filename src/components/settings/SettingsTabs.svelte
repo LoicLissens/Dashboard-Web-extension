@@ -12,25 +12,32 @@
 <script lang="ts">
     import { createEventDispatcher } from "svelte";
 
-    const dispatch = createEventDispatcher();
+    const dispatch = createEventDispatcher<{ changeTab: Tab }>();
 
     export let activeTab: Tab;
 </script>
 
-<div class="tabs is-small">
-    <ul>
-        <li class={activeTab == Tab.General && "is-active"}>
-            <a href="#" on:click={() => dispatch("changeTab", "general")}>
-                <GeneralIcon  size="" /> General</a
-            >
-        </li>
-        <li class={activeTab == Tab.Videos && "is-active"}>
-            <a href="#" on:click={() => dispatch("changeTab", "videos")}
-                ><span class="icon">
-                   <VideoIcon size="" isFocused={false} />
-                </span>Videos</a
-            >
-        </li>
-    </ul>
-    <kbd class="key">esc</kbd>
+<!-- daisyUI tabs are flat: the ul/li wrapper Bulma required is gone. -->
+<div class="flex items-center justify-between">
+    <div role="tablist" class="tabs tabs-border tabs-sm">
+        <button
+            role="tab"
+            type="button"
+            class="tab gap-1"
+            class:tab-active={activeTab === Tab.General}
+            on:click={() => dispatch("changeTab", Tab.General)}
+        >
+            <GeneralIcon size={IconSize.Small} /> General
+        </button>
+        <button
+            role="tab"
+            type="button"
+            class="tab gap-1"
+            class:tab-active={activeTab === Tab.Videos}
+            on:click={() => dispatch("changeTab", Tab.Videos)}
+        >
+            <VideoIcon size={IconSize.Small} isFocused={false} /> Videos
+        </button>
+    </div>
+    <kbd class="kbd kbd-sm">esc</kbd>
 </div>

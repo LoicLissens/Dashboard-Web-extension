@@ -81,6 +81,7 @@ export default [{
 		// instead of npm run dev), minify
 		production && terser(),
 		replace({
+			preventAssignment: true,
 			FOO: 'bar',
 			process: JSON.stringify({
 				env: {
@@ -96,13 +97,20 @@ export default [{
 	}
 },
 {
-	input: "src/background.js",
+	input: "src/background.ts",
 	output: {
 		sourcemap: true,
 		format: "iife",
 		file: "public/build/background.js",
 	},
-	plugins: [resolve(), commonjs()],
+	plugins: [
+		resolve({ browser: true }),
+		commonjs(),
+		typescript({
+			sourceMap: !production,
+			inlineSources: !production
+		}),
+	],
 	watch: {
 		clearScreen: false,
 	},

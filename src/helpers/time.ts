@@ -1,11 +1,9 @@
-export const greeting = (timeStamp:number) => {
+export const greeting = (timeStamp:number): string => {
     const hours = new Date(timeStamp).getHours();
-    let greeting;
-    if (hours >= 5 && hours < 12) greeting = "Good morning";
-    if (hours >= 12 && hours < 18) greeting = "Good afternoon";
-    if (hours >= 18 && hours < 23) greeting = "Good evening";
-    if ( hours >= 23 || hours < 5) greeting = "Good night";
-    return greeting;
+    if (hours >= 5 && hours < 12) return "Good morning";
+    if (hours >= 12 && hours < 18) return "Good afternoon";
+    if (hours >= 18 && hours < 23) return "Good evening";
+    return "Good night";
 };
 export const msToDate = (timeStamp : number):string => {
     const time = new Date(timeStamp)
@@ -22,8 +20,8 @@ export const msToDate = (timeStamp : number):string => {
     }
     return `${d.dayName} ${d.day} ${d.month} ${d.hours}:${d.minutes}:${d.seconds}`
 };
-export const timeStringToSeconds = (string:string): number => {
-    const splitTime = string.split(":");
+export const timeStringToSeconds = (value:string): number => {
+    const splitTime = value.split(":");
     const hour = parseInt(splitTime[0], 10) * 3600;
     const min = parseInt(splitTime[1], 10) * 60;
     return hour + min

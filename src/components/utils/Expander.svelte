@@ -2,13 +2,19 @@
     import Divider from "./Divider.svelte";
     export let expanded: boolean = false;
     export let title: string;
-    export let titleSize = "is-3";
+    /** Tailwind text-size utility for the title. */
+    export let titleSize = "text-3xl";
 </script>
 
-<div class="is-flex has-text-grey mt-1">
-    <span><p class={`title ${titleSize} has-text-grey`}>{title}</p></span>
-    <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <span class="is-clickable is-flex" on:click={() => (expanded = !expanded)}>
+<div class="flex items-center gap-2 text-base-content/60 mt-1">
+    <span><p class="{titleSize} font-bold">{title}</p></span>
+    <button
+        type="button"
+        class="flex cursor-pointer"
+        aria-expanded={expanded}
+        aria-label={expanded ? "Collapse" : "Expand"}
+        on:click={() => (expanded = !expanded)}
+    >
         {#if expanded}
             <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -42,7 +48,7 @@
                 />
             </svg>
         {/if}
-    </span>
+    </button>
 </div>
 <Divider />
 {#if expanded}

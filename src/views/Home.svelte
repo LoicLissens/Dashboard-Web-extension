@@ -5,7 +5,7 @@
   import Expander from '../components/utils/Expander.svelte';
 </script>
 
-<section in:fade>
+<section class="w-[70%] mx-auto" in:fade>
   <Expander title="Task">
     <Todo />
   </Expander>
@@ -13,10 +13,3 @@
     <Colors />
   </Expander>
 </section>
-
-<style>
-  section {
-    width: 70%;
-    margin: 0 auto;
-  }
-</style>

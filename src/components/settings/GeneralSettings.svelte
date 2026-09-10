@@ -48,11 +48,11 @@
 </script>
 
 <div>
-    <section>
-        <h5 class="title is-5 has-text-grey my-2">Config JSON file</h5>
-        <button class="button is-success is-outlined" on:click={downloadConfig}>
+    <section class="flex flex-col items-start gap-3">
+        <h5 class="text-xl font-bold text-base-content/60 my-2">Config JSON file</h5>
+        <button class="btn btn-success btn-outline" on:click={downloadConfig}>
             <span>Download</span>
-            <span class="icon is-small">
+            <span class="inline-flex items-center justify-center size-4">
                 <svg
                     viewBox="0 0 24 24"
                     fill="none"
@@ -73,12 +73,12 @@
             </span>
         </button>
         <ConfigFileUploader/>
-        <button class="button is-danger is-outlined is-light" on:click={clearConfig}>
+        <button class="btn btn-error btn-outline btn-soft" on:click={clearConfig}>
             Delete config
         </button>
-        <Expander title="Current config" titleSize="is-6" expanded={false}>
+        <Expander title="Current config" titleSize="text-lg" expanded={false}>
             {#await getJSONConfig()}
-                <p class="is-skeleton"></p>
+                <p class="skeleton h-4 w-32"></p>
             {:then}
                 <CodeBlock code={JSONConfig} />
             {:catch error}

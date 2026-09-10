@@ -15,7 +15,11 @@
     let categoryToRegister = "";
     let isDanger = false;
 
-    const dispatch = createEventDispatcher();
+    const dispatch = createEventDispatcher<{
+        closeModal: never;
+        categoryRegistered: Category;
+        categoryDeleted: Category;
+    }>();
 
     function closeModal() {
         isDanger = false;
@@ -53,39 +57,38 @@
 </script>
 
 <Modal {isModalActive} on:closeModal={closeModal}>
-    <div class="is-flex is-justify-content-space-between">
-        <h1
-            class="title has-text-weight-semibold has-text-centered has-text-grey"
-        >
+    <div class="flex items-center justify-between">
+        <h1 class="text-2xl font-semibold text-center text-base-content/60">
             Register a video category
         </h1>
-        <kbd class="key">esc</kbd>
+        <kbd class="kbd kbd-sm">esc</kbd>
     </div>
-    <div class="is-flex is-justify-content-center">
-        <div class="px-2">
+    <div class="flex justify-center items-center gap-2 my-4">
+        <div>
             <input
                 bind:value={categoryToRegister}
                 placeholder="Category"
                 type="text"
-                class="input {isDanger && 'is-danger'}"
+                class="input input-bordered {isDanger ? 'input-error' : ''}"
                 on:keydown={onPressEnter}
             />
         </div>
         <button
-            class="button is-primary is-outlined has-text-grey"
+            class="btn btn-primary btn-outline"
             on:click={() => storeCatergory(categoryToRegister)}
             >Register Category</button
         >
     </div>
     <div>
         <h2>Existing categories :</h2>
-        <div class="tags">
+        <div class="flex flex-wrap gap-1">
             {#each existingCategories as category}
-                <span class="tag mr-1"
+                <span class="badge gap-1"
                     >{category}<button
-                        class="delete is-small"
+                        class="btn btn-xs btn-circle btn-ghost"
+                        aria-label={`Delete category ${category}`}
                         on:click={()=>deleteCategory(category)}
-                    ></button></span
+                    >✕</button></span
                 >
             {/each}
         </div>

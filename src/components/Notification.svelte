@@ -5,10 +5,10 @@
     export let notification: Notification;
 
     const colorStatusMapper = {
-        [NotificationStatus.Success]: "is-success",
-        [NotificationStatus.Error]: "is-danger",
-        [NotificationStatus.Warning]: "is-warning",
-        [NotificationStatus.Info]: "is-info",
+        [NotificationStatus.Success]: "alert-success",
+        [NotificationStatus.Error]: "alert-error",
+        [NotificationStatus.Warning]: "alert-warning",
+        [NotificationStatus.Info]: "alert-info",
     };
     $: colorByStatus = colorStatusMapper[notification.status]
 
@@ -19,19 +19,14 @@
     });
 </script>
 
-<div class="notification {colorByStatus} is-light is-flex">
-    {notification.message}
-    <button on:click={() => removeNotification(notification.id)} class="ml-2">
-        <span class="delete is-medium">
-        </span>
+<!-- Positioning lives in the `toast` container in App.svelte. -->
+<div class="alert {colorByStatus} alert-soft">
+    <span>{notification.message}</span>
+    <button
+        class="btn btn-sm btn-circle btn-ghost"
+        aria-label="Dismiss notification"
+        on:click={() => removeNotification(notification.id)}
+    >
+        ✕
     </button>
 </div>
-
-<style scoped>
-    div {
-        position: fixed;
-        top: 0;
-        right: 0;
-        z-index: 9999;
-    }
-</style>

@@ -4,6 +4,12 @@ import {
     type Channel,
     type Category,
 } from "../helpers/manageStorage";
+import {
+    type YoutubeChannelIdResponse,
+    type YoutubeChannelInfoResponse,
+    type YoutubePlaylistItemsResponse,
+    type YoutubeVideoPlayerResponse,
+} from "./types";
 
 const api = axios.create({
     baseURL: 'https://youtube.googleapis.com/youtube/v3',
@@ -21,16 +27,16 @@ class YoutubeAPI {
         this.API_KEY = key
     }
     getChannelIdByUsername(username: string) {
-        return api.get(`/channels?part=snippet&forHandle=${username}&key=${this.API_KEY}`)
+        return api.get<YoutubeChannelIdResponse>(`/channels?part=snippet&forHandle=${username}&key=${this.API_KEY}`)
     }
     getChannelInfo(channelId: string) {
-        return api.get(`/channels?id=${channelId}&key=${this.API_KEY}&part=snippet,contentDetails`) //TODO: maybe getChannelIdByUsername and getChannelInfo can be mutualized by just using the forHandle instead of id
+        return api.get<YoutubeChannelInfoResponse>(`/channels?id=${channelId}&key=${this.API_KEY}&part=snippet,contentDetails`) //TODO: maybe getChannelIdByUsername and getChannelInfo can be mutualized by just using the forHandle instead of id
     }
     getPlaylistItems(playlistId: string) {
-        return api.get(`/playlistItems?part=snippet&playlistId=${playlistId}&key=${this.API_KEY}`)
+        return api.get<YoutubePlaylistItemsResponse>(`/playlistItems?part=snippet&playlistId=${playlistId}&key=${this.API_KEY}`)
     }
     getVideoPlayer(videoId: string) {
-        return api.get(`/videos?part=player&id=${videoId}&key=${this.API_KEY}`)
+        return api.get<YoutubeVideoPlayerResponse>(`/videos?part=player&id=${videoId}&key=${this.API_KEY}`)
     }
     // helper method
     async getChannelIDfromURL(url: string): Promise<string> {
@@ -39,8 +45,11 @@ class YoutubeAPI {
         const userName = subUrl
         try {
             const resp = await this.getChannelIdByUsername(userName);
-            const data = resp.data;
-            return  data.items[0].id;
+            const channel = resp.data.items?.[0];
+            if (!channel) {
+                throw new Error("Invalid channel URL");
+            }
+            return channel.id;
         } catch (err) {
             console.log(err);
 
@@ -50,8 +59,12 @@ class YoutubeAPI {
     async fetchChannelInfo(channelID: string, category: Category):Promise<Channel>{
         try {
             const resp = await this.getChannelInfo(channelID);
-            const details = resp.data.items[0].contentDetails;
-            const info = resp.data.items[0].snippet;
+            const item = resp.data.items?.[0];
+            if (!item) {
+                throw new Error("Channel not found");
+            }
+            const details = item.contentDetails;
+            const info = item.snippet;
             const fullChannelObj: Channel = {
                 category: category,
                 channelId: channelID,

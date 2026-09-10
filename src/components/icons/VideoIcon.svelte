@@ -3,11 +3,14 @@
     import { type IconSize } from "./BaseIcon.svelte";
     export let size: IconSize;
     export let isFocused: boolean;
-    $: strokeColor = isFocused ? "hsl(171, 100%, 41%)" : "currentColor";
 </script>
 
-<BaseIcon {size} scaleOnHover={true}>
-    <svg fill={strokeColor} viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg"
+<BaseIcon
+    {size}
+    scaleOnHover={true}
+    colorClass={isFocused ? "text-primary" : "text-base-content/40"}
+>
+    <svg fill="currentColor" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg"
         ><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g
             id="SVGRepo_tracerCarrier"
             stroke-linecap="round"

@@ -6,13 +6,24 @@
 
 	<title>Dashboard</title>
 
+	<!-- Applies the stored theme before first paint to avoid a flash of the
+	     wrong theme. chrome.storage is async and cannot be read this early, so
+	     Theme.svelte mirrors the choice into localStorage purely as a
+	     paint-time hint; chrome.storage remains the source of truth. -->
+	<script>
+		try {
+			var t = localStorage.getItem('theme');
+			if (t) document.documentElement.setAttribute('data-theme', t);
+		} catch (e) {}
+	</script>
+
 	<link rel='icon' type='image/png' href='/favicon.png'>
-	<link rel='stylesheet' href='/global.css'>
+	<link rel='stylesheet' href='/build/tailwind.css'>
 	<link rel='stylesheet' href='/build/bundle.css'>
 
 	<script defer src='/build/bundle.js'></script>
 </head>
 
-<body class="has-navbar-fixed-top">
+<body>
 </body>
 </html>
