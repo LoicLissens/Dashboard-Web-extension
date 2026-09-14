@@ -95,7 +95,7 @@
                 <div>
                     <div class="relative inline-block">
                         <input
-                            class="input input-bordered pr-10"
+                            class="input pr-10"
                             type={showKey ? "text" : "password"}
                             value={ytApiKey}
                             disabled={isDisabled}
@@ -128,7 +128,7 @@
     {:else}
         <form on:submit|preventDefault={(e) => setApiKey(e)}>
             <input
-                class="input input-bordered w-full max-w-xs"
+                class="input w-full max-w-xs"
                 name="key"
                 type="text"
                 placeholder="Add a Youtube API key"
@@ -177,7 +177,7 @@
                             </div>
                             <div>
                                 Number of video to retrieve : <input
-                                    class="input input-bordered input-sm w-20"
+                                    class="input input-sm w-20"
                                     type="number"
                                     min="1"
                                     max="5"

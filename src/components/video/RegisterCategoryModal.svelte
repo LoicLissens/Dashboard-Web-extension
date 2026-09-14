@@ -69,7 +69,7 @@
                 bind:value={categoryToRegister}
                 placeholder="Category"
                 type="text"
-                class="input input-bordered {isDanger ? 'input-error' : ''}"
+                class="input {isDanger ? 'input-error' : ''}"
                 on:keydown={onPressEnter}
             />
         </div>

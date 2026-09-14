@@ -145,7 +145,7 @@
             bind:value={newTask.label}
             placeholder="What needs to be done?"
             type="text"
-            class="input input-bordered flex-1 min-w-48"
+            class="input flex-1 min-w-48"
             on:keypress={(e) =>
               e.key === "Enter" && !disabledButton && addTask()}
           />
@@ -154,7 +154,7 @@
             bind:value={newTask.hour}
             min="00:00"
             max="23:59"
-            class="input input-bordered"
+            class="input"
             placeholder="Time"
           />
           <button

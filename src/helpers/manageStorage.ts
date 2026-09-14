@@ -8,7 +8,25 @@ export enum StorageKeys {
     TASKS = 'tasks',
     NAME = 'name',
     METEO_CACHE = 'meteoCache',
+    SYNC_SETTINGS = 'syncSettings',
+    SYNC_STATE = 'syncState',
+    SYNC_META = 'syncMeta',
 }
+
+export const SYNCED_KEYS = [
+    StorageKeys.CATEGORIES,
+    StorageKeys.THEME,
+    StorageKeys.VIDEO,
+    StorageKeys.YOUTUBEAPIKEY,
+    StorageKeys.TASKS,
+    StorageKeys.NAME,
+] as const;
+
+export type SyncedKey = typeof SYNCED_KEYS[number];
+
+const SYNCED_KEY_SET: Set<string> = new Set(SYNCED_KEYS);
+
+export type SyncMeta = Partial<Record<SyncedKey, number>>;
 
 export enum Theme {
     LIGHT = 'light',
@@ -18,41 +36,46 @@ export enum Page {
     HOME = 'Home',
     VIDEOS = 'Videos',
 }
-export interface Task {
-    id?: string,
-    /** Also acts as the task's identity: used as the `{#each}` key and for
-     *  duplicate detection and removal, so it must always be present. */
-    label: string,
-    hour?: string,
-    done?: boolean,
-}
+export const VideoSchema = z.object({
+    title: z.string(),
+    thumbnail: z.string(),
+    id: z.string(),
+});
 
-export interface Video {
-    title: string,
-    thumbnail: string
-    id: string,
-}
-export interface Channel {
-    category: Category,
-    channelId: string,
-    uploadPlaylistId: string,
-    name: string,
-    description: string,
-    country: string,
-    defaultAvatrUrl: string,
-    mediumAvatarUrl: string,
-    highAvatarUrl: string,
-    nbVideoToRetrieve: number
-    hiddenVideos: Array<Video>
-}
-export interface MeteoCache {
-    createdAt: number,
-    currTemp: number,
-    currUnit: string,
-    todayMaxTemp: number,
-    todayMinTemp: number,
-    todayUnit:string
-}
+export const TaskSchema = z.object({
+    id: z.string().optional(),
+    label: z.string(),
+    hour: z.string().optional(),
+    done: z.boolean().optional(),
+});
+
+export const ChannelSchema = z.object({
+    category: z.string(),
+    channelId: z.string(),
+    uploadPlaylistId: z.string(),
+    name: z.string(),
+    defaultAvatrUrl: z.string(),
+    nbVideoToRetrieve: z.number(),
+    hiddenVideos: z.array(VideoSchema),
+    description: z.string().optional(),
+    country: z.string().optional(),
+    mediumAvatarUrl: z.string().optional(),
+    highAvatarUrl: z.string().optional(),
+});
+
+export const MeteoCacheSchema = z.object({
+    createdAt: z.number(),
+    currTemp: z.number(),
+    currUnit: z.string(),
+    todayMaxTemp: z.number(),
+    todayMinTemp: z.number(),
+    todayUnit: z.string(),
+});
+
+export type Video = z.infer<typeof VideoSchema>;
+export type Task = z.infer<typeof TaskSchema>;
+export type Channel = z.infer<typeof ChannelSchema>;
+export type MeteoCache = z.infer<typeof MeteoCacheSchema>;
 
 export type Category = string
 export type Categories = Array<Category>
@@ -64,7 +87,9 @@ export const OptionalUserConfigSchema = z.object({
     theme: z.nativeEnum(Theme),
     youtube: z.string().regex(/^[A-Za-z0-9_-]+$/, {
         message: "La clé API YouTube doit être au format valide"
-    })
+    }),
+    tasks: z.array(TaskSchema),
+    video: z.array(ChannelSchema),
 }).partial()
 export const UserConfigSchema = OptionalUserConfigSchema.extend({
     configVersion: z.string(),
@@ -87,7 +112,25 @@ export function validateUserConfig(config: unknown): UserConfig {
  * @returns {promise}
  */
 export const setTobrowserStorage = async (key: StorageKeys, payload: unknown): Promise<void> => {
-    return await browser.storage.local.set({ [key]: payload })
+    await browser.storage.local.set({ [key]: payload })
+    if (SYNCED_KEY_SET.has(key)) {
+        await markKeyUpdated(key as SyncedKey)
+    }
+}
+
+export const markKeyUpdated = async (key: SyncedKey, at: number = Date.now()): Promise<void> => {
+    const meta = await getSyncMeta()
+    meta[key] = at
+    await browser.storage.local.set({ [StorageKeys.SYNC_META]: meta })
+}
+
+export const getSyncMeta = async (): Promise<SyncMeta> => {
+    const meta = await getFromBrowserStorage(StorageKeys.SYNC_META)
+    return (meta as SyncMeta) || {}
+}
+
+export const setSyncMeta = async (meta: SyncMeta): Promise<void> => {
+    await browser.storage.local.set({ [StorageKeys.SYNC_META]: meta })
 }
 /**
  * A reusable function to get data from local browser storage
@@ -109,9 +152,15 @@ export const getAllFromStorage = async () => {
     return await browser.storage.local.get()
 }
 export const getUserConfigFromStorage = async ():Promise<UserConfig> => {
-    const fullStorage =  await browser.storage.local.get()
-    return  Object.fromEntries(
-        Object.entries(fullStorage).filter(([key]) => ![StorageKeys.METEO_CACHE as string].includes(key))
+    const fullStorage = await browser.storage.local.get()
+    const excluded: string[] = [
+        StorageKeys.METEO_CACHE,
+        StorageKeys.SYNC_SETTINGS,
+        StorageKeys.SYNC_STATE,
+        StorageKeys.SYNC_META,
+    ]
+    return Object.fromEntries(
+        Object.entries(fullStorage).filter(([key]) => !excluded.includes(key))
       ) as UserConfig;
 
 }

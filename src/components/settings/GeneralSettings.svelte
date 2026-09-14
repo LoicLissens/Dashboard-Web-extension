@@ -7,6 +7,7 @@
     import CodeBlock from "../utils/CodeBlock.svelte";
     import Expander from "../utils/Expander.svelte";
     import ConfigFileUploader from "./ConfigFileUploader.svelte";
+    import SyncSettings from "./SyncSettings.svelte";
 
 
     let JSONConfig: string;
@@ -85,5 +86,8 @@
                 <p>Error: {error.message}</p>
             {/await}
         </Expander>
+    </section>
+    <section class="mt-6">
+        <SyncSettings />
     </section>
 </div>
