@@ -8,17 +8,11 @@ export enum StorageKeys {
     TASKS = 'tasks',
     NAME = 'name',
     METEO_CACHE = 'meteoCache',
-    // Device-local only -- never part of the synced payload.
     SYNC_SETTINGS = 'syncSettings',
     SYNC_STATE = 'syncState',
     SYNC_META = 'syncMeta',
 }
 
-/**
- * Keys included in the synced payload. `meteoCache` is excluded because it is
- * derived from this device's geolocation, and the SYNC_* keys are excluded
- * because they are per-device (one of them holds the token guarding the sync).
- */
 export const SYNCED_KEYS = [
     StorageKeys.CATEGORIES,
     StorageKeys.THEME,
@@ -32,7 +26,6 @@ export type SyncedKey = typeof SYNCED_KEYS[number];
 
 const SYNCED_KEY_SET: Set<string> = new Set(SYNCED_KEYS);
 
-/** Per-key "when did this device last change it" stamps, used to merge. */
 export type SyncMeta = Partial<Record<SyncedKey, number>>;
 
 export enum Theme {
@@ -51,8 +44,6 @@ export const VideoSchema = z.object({
 
 export const TaskSchema = z.object({
     id: z.string().optional(),
-    /** Also acts as the task's identity: used as the `{#each}` key and for
-     *  duplicate detection and removal, so it must always be present. */
     label: z.string(),
     hour: z.string().optional(),
     done: z.boolean().optional(),
@@ -66,9 +57,6 @@ export const ChannelSchema = z.object({
     defaultAvatrUrl: z.string(),
     nbVideoToRetrieve: z.number(),
     hiddenVideos: z.array(VideoSchema),
-    // Fetched from the YouTube API and persisted, but never read by the UI.
-    // Optional so that validation tolerates channels stored before/after these
-    // were populated, and so the sync payload stays small.
     description: z.string().optional(),
     country: z.string().optional(),
     mediumAvatarUrl: z.string().optional(),
@@ -100,9 +88,6 @@ export const OptionalUserConfigSchema = z.object({
     youtube: z.string().regex(/^[A-Za-z0-9_-]+$/, {
         message: "La clé API YouTube doit être au format valide"
     }),
-    // Previously absent from the schema, so zod silently stripped them on
-    // import -- exporting and re-importing a config discarded every task and
-    // every registered channel.
     tasks: z.array(TaskSchema),
     video: z.array(ChannelSchema),
 }).partial()
@@ -128,14 +113,11 @@ export function validateUserConfig(config: unknown): UserConfig {
  */
 export const setTobrowserStorage = async (key: StorageKeys, payload: unknown): Promise<void> => {
     await browser.storage.local.set({ [key]: payload })
-    // Stamping here rather than in each setter means every write to a synced
-    // key is recorded, including direct callers (theme, name, API key).
     if (SYNCED_KEY_SET.has(key)) {
         await markKeyUpdated(key as SyncedKey)
     }
 }
 
-/** Records that `key` changed on this device just now. */
 export const markKeyUpdated = async (key: SyncedKey, at: number = Date.now()): Promise<void> => {
     const meta = await getSyncMeta()
     meta[key] = at

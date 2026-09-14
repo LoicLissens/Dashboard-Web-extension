@@ -1,27 +1,10 @@
-/**
- * Minimal GitHub Contents API client for config sync.
- *
- * Runs directly from the extension page: MV3's cross-origin clampdown applies
- * to content scripts, not extension pages, and this project has no content
- * scripts. `host_permissions` in the manifest covers api.github.com.
- *
- * Conflict detection is delegated to GitHub. Every file read returns a blob
- * `sha`; writing requires passing the `sha` you read. If another machine wrote
- * in between, GitHub rejects the write with 409 rather than clobbering it.
- * That is a real compare-and-swap, so correctness does not depend on the two
- * machines' clocks agreeing.
- */
-
 const API_ROOT = "https://api.github.com";
 
 export interface SyncSettings {
-    /** Fine-grained PAT with Contents read/write on this repo only. */
     token: string;
     owner: string;
     repo: string;
-    /** Path of the JSON file inside the repo, e.g. "dashboard-config.json". */
     path: string;
-    /** Optional; GitHub uses the repo's default branch when omitted. */
     branch?: string;
 }
 
@@ -30,7 +13,6 @@ export interface RemoteFile<T> {
     sha: string;
 }
 
-/** Thrown when the remote moved since the sha we were given. */
 export class ConflictError extends Error {
     constructor() {
         super("Remote changed since last read");
@@ -85,10 +67,6 @@ function headers(settings: SyncSettings): Record<string, string> {
     };
 }
 
-/**
- * Reads the config file. Returns null when the file does not exist yet, which
- * is the normal first-run state rather than an error.
- */
 export async function readRemote<T>(settings: SyncSettings): Promise<RemoteFile<T> | null> {
     const url = new URL(contentsUrl(settings));
     if (settings.branch) {
@@ -107,11 +85,6 @@ export async function readRemote<T>(settings: SyncSettings): Promise<RemoteFile<
     return { content: JSON.parse(base64ToUtf8(body.content)) as T, sha: body.sha };
 }
 
-/**
- * Writes the config file. Pass the `sha` from the matching read, or null to
- * create the file. A 409 (or the 422 GitHub returns for a stale sha) surfaces
- * as ConflictError so the caller can re-read and re-merge.
- */
 export async function writeRemote<T>(
     settings: SyncSettings,
     content: T,

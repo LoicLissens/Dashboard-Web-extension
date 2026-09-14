@@ -35,14 +35,6 @@
  *
  * Recolour that one variable and close the gap so border and outline read as
  * one ring.
- *
- * Two subtleties:
- *  - `:open` matters as much as `:focus`. When a <select>'s dropdown opens,
- *    focus moves to the popup, so the element is `:open` but NOT `:focus`.
- *  - Fields carrying an explicit colour modifier are excluded. This rule is
- *    unlayered and so outranks daisyUI's layered ones; without the guard it
- *    would repaint an `input-error` field primary on focus and hide the error.
- *    Add further `:not()`s here if other colour modifiers get used.
  */
 .input:not(.input-error):focus,
 .input:not(.input-error):focus-within,

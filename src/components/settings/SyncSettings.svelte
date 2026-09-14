@@ -67,8 +67,6 @@
                     : `${result.outcome} (${result.pulledKeys.length} in, ${result.pushedKeys.length} out)`;
             addNotification(detail, NotificationStatus.Success);
             if (result.pulledKeys.length > 0) {
-                // Pulled values are already in storage, but components read them
-                // on mount, so a reload is the honest way to show them.
                 setTimeout(() => window.location.reload(), 1200);
             }
         } catch (e) {
@@ -120,9 +118,6 @@
                 bind:value={branch}
             />
         </div>
-        <!-- Same shape as the YouTube API key field in VideoSettings: a
-             one-way `value` (not bind:) is what allows the dynamic `type`,
-             with the eye toggle overlaid on the right of the input. -->
         <div class="relative">
             <input
                 class="input w-full pr-10"

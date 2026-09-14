@@ -1,16 +1,3 @@
-/**
- * Config sync across machines.
- *
- * Two mechanisms, each doing what it is good at:
- *  - GitHub's blob `sha` DETECTS whether a conflict exists. It is server
- *    authoritative, so this does not depend on the machines' clocks agreeing.
- *  - Per-key `updatedAt` stamps RESOLVE one when it does, so editing a todo on
- *    one machine and adding a channel on another merges instead of one side
- *    winning wholesale.
- *
- * Merging per key also means deletions inside a list work without tombstones:
- * the array is the unit being replaced.
- */
 import browser from "webextension-polyfill";
 import {
     StorageKeys,
@@ -71,7 +58,6 @@ const setSyncState = async (state: SyncState): Promise<void> => {
     await browser.storage.local.set({ [StorageKeys.SYNC_STATE]: state });
 };
 
-/** Builds the envelope representing this device's current state. */
 const buildLocalEnvelope = async (meta: SyncMeta): Promise<SyncEnvelope> => {
     const stored = await browser.storage.local.get();
     const entries: Partial<Record<SyncedKey, SyncEntry>> = {};
@@ -88,7 +74,6 @@ const buildLocalEnvelope = async (meta: SyncMeta): Promise<SyncEnvelope> => {
     return { schemaVersion: SYNC_SCHEMA_VERSION, updatedAt: newest, entries };
 };
 
-/** Writes the keys the remote won into local storage, without re-stamping them. */
 const applyPulledEntries = async (
     envelope: SyncEnvelope,
     pulledKeys: SyncedKey[],
@@ -101,17 +86,11 @@ const applyPulledEntries = async (
         const entry = envelope.entries[key];
         if (!entry) continue;
         payload[key] = entry.value;
-        // Carry the remote's stamp across, so this device does not claim to
-        // have authored a change it merely received.
         meta[key] = entry.updatedAt;
     }
     await browser.storage.local.set(payload);
 };
 
-/**
- * Runs one sync pass. Retries once on a 409, which means another machine wrote
- * between our read and our write.
- */
 export const syncNow = async (attempt = 0): Promise<SyncResult> => {
     const settings = await getSyncSettings();
     if (!settings) {
@@ -146,8 +125,6 @@ export const syncNow = async (attempt = 0): Promise<SyncResult> => {
             );
         } catch (e) {
             if (e instanceof ConflictError && attempt === 0) {
-                // Someone pushed mid-flight. Re-read and re-merge; the merge is
-                // idempotent so a second pass converges.
                 await setSyncMeta(meta);
                 return syncNow(attempt + 1);
             }
