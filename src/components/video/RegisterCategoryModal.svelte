@@ -16,7 +16,7 @@
     let isDanger = false;
 
     const dispatch = createEventDispatcher<{
-        closeModal: never;
+        closeModal: null;
         categoryRegistered: Category;
         categoryDeleted: Category;
     }>();

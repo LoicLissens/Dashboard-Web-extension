@@ -61,6 +61,11 @@ export default [{
 		// https://github.com/rollup/plugins/tree/master/packages/commonjs
 		resolve({
 			browser: true,
+			// Pick the `browser` + `require` branch of a package's `exports`
+			// map, which for axios is its self-contained browser bundle
+			// (dist/browser/axios.cjs) rather than the Node entry that drags
+			// in http/https/zlib/stream. commonjs() converts it.
+			exportConditions: ['browser', 'require'],
 			dedupe: ['svelte']
 		}),
 		commonjs(),
@@ -82,13 +87,14 @@ export default [{
 		production && terser(),
 		replace({
 			preventAssignment: true,
-			FOO: 'bar',
-			process: JSON.stringify({
-				env: {
-					isProd: production,
-					...config().parsed
-				}
-			}),
+			// Targeted member expressions only. Replacing the bare `process`
+			// identifier also rewrote third-party code -- axios's
+			// `process.nextTick(cb)` became `{"env":{...}}.nextTick(cb)`, a
+			// syntax error that fails the build.
+			'process.env.isProd': JSON.stringify(production),
+			'process.env.YOUTUBE_API_KEY': JSON.stringify(
+				(config().parsed || {}).YOUTUBE_API_KEY || ''
+			),
 		}),
 		json()
 	],
