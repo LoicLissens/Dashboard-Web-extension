@@ -8,7 +8,7 @@
 
     let dialog: HTMLDialogElement;
 
-    const dispatch = createEventDispatcher<{ closeModal: never }>();
+    const dispatch = createEventDispatcher<{ closeModal: null }>();
 
     // `dialog` is only assigned once the element is mounted, so this also
     // covers the case of the component mounting with isModalActive already true.

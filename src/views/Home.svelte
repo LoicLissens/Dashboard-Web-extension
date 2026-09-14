@@ -5,7 +5,7 @@
   import Expander from '../components/utils/Expander.svelte';
 </script>
 
-<section class="w-[70%] mx-auto" in:fade>
+<section class="w-[70%] mx-auto" in:fade|global>
   <Expander title="Task">
     <Todo />
   </Expander>

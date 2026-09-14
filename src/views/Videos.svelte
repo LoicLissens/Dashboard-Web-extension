@@ -32,7 +32,7 @@
   });
 </script>
 
-<section class="w-[70%] mx-auto" in:fade>
+<section class="w-[70%] mx-auto" in:fade|global>
   {#if apiProvided}
     <VideosConfig
       on:channelRegistered={(e) => {

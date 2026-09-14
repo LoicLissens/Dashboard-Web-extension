@@ -10,6 +10,23 @@ import { config } from 'dotenv';
 import replace from '@rollup/plugin-replace';
 const production = !process.env.ROLLUP_WATCH;
 import json from '@rollup/plugin-json';
+import path from 'path';
+
+// axios ships an `exports` map, which per spec supersedes its legacy `browser`
+// field. node-resolve >=15 honours `exports`, so the browser-field redirects
+// that used to null out the Node adapter no longer apply and http/https/zlib
+// get dragged in. Pin the package to the browser ESM build axios publishes.
+// (Forcing a global `require` export condition also works for axios but makes
+// zod resolve to CJS, which lands untransformed in the bundle.)
+const axiosBrowserESM = {
+	name: 'axios-browser-esm',
+	resolveId(source) {
+		if (source === 'axios') {
+			return path.resolve(process.cwd(), 'node_modules/axios/dist/esm/axios.js');
+		}
+		return null;
+	}
+};
 
 function serve() {
 	let server;
@@ -59,8 +76,10 @@ export default [{
 		// some cases you'll need additional configuration -
 		// consult the documentation for details:
 		// https://github.com/rollup/plugins/tree/master/packages/commonjs
+		axiosBrowserESM,
 		resolve({
 			browser: true,
+			exportConditions: ['browser'],
 			dedupe: ['svelte']
 		}),
 		commonjs(),
@@ -82,13 +101,14 @@ export default [{
 		production && terser(),
 		replace({
 			preventAssignment: true,
-			FOO: 'bar',
-			process: JSON.stringify({
-				env: {
-					isProd: production,
-					...config().parsed
-				}
-			}),
+			// Targeted member expressions only. Replacing the bare `process`
+			// identifier also rewrote third-party code -- axios's
+			// `process.nextTick(cb)` became `{"env":{...}}.nextTick(cb)`, a
+			// syntax error that fails the build.
+			'process.env.isProd': JSON.stringify(production),
+			'process.env.YOUTUBE_API_KEY': JSON.stringify(
+				(config().parsed || {}).YOUTUBE_API_KEY || ''
+			),
 		}),
 		json()
 	],

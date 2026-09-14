@@ -8,7 +8,7 @@
 
     export let isModalActive: boolean;
 
-    const dispatch = createEventDispatcher<{ closeModal: never }>();
+    const dispatch = createEventDispatcher<{ closeModal: null }>();
 
     let activeTab: Tab = Tab.General;
 
