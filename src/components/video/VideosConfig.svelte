@@ -85,14 +85,14 @@
                 bind:value={channelURL}
                 placeholder="Channel URL"
                 type="text"
-                class="input input-bordered {isError ? 'input-error' : ''}"
+                class="input {isError ? 'input-error' : ''}"
             />
             {#if isAddingChannel}
                 <span class="loading loading-spinner loading-sm"></span>
             {/if}
         </div>
         <select
-                class="select select-bordered"
+                class="select"
                 bind:value={categoryChannel}
                 name="pets"
                 id="category-select"

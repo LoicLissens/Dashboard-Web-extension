@@ -2,12 +2,19 @@
   "manifest_version": 3,
   "name": "My Extension",
   "version": "1.0.0",
-  "permissions": ["storage"],
+  "permissions": [
+    "storage"
+  ],
   "background": {
-    "scripts": ["build/background.js"],
+    "scripts": [
+      "build/background.js"
+    ],
     "persistent": false
   },
-  "chrome_url_overrides":{
-    "newtab":"index.html"
-  }
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  },
+  "host_permissions": [
+    "https://api.github.com/*"
+  ]
 }

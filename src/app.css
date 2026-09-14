@@ -26,3 +26,35 @@
 .blur {
   backdrop-filter: blur(5px);
 }
+
+/*
+ * daisyUI 5 drives a form field's border, box-shadow AND focus outline from a
+ * single `--input-color`, and sets it to base-content in every active state.
+ * In the dark theme base-content is near-white, so an active field renders as
+ * a white border, a 2px gap, then a second white ring -- a double halo.
+ *
+ * Recolour that one variable and close the gap so border and outline read as
+ * one ring.
+ *
+ * Two subtleties:
+ *  - `:open` matters as much as `:focus`. When a <select>'s dropdown opens,
+ *    focus moves to the popup, so the element is `:open` but NOT `:focus`.
+ *  - Fields carrying an explicit colour modifier are excluded. This rule is
+ *    unlayered and so outranks daisyUI's layered ones; without the guard it
+ *    would repaint an `input-error` field primary on focus and hide the error.
+ *    Add further `:not()`s here if other colour modifiers get used.
+ */
+.input:not(.input-error):focus,
+.input:not(.input-error):focus-within,
+.select:not(.select-error):focus,
+.select:not(.select-error):focus-within,
+.select:not(.select-error):open,
+.textarea:not(.textarea-error):focus,
+.textarea:not(.textarea-error):focus-within,
+.file-input:not(.file-input-error):focus,
+.file-input:not(.file-input-error):focus-within {
+  --input-color: var(--color-primary);
+  outline-color: var(--color-primary);
+  outline-offset: 0;
+}
+

@@ -32,7 +32,7 @@
         name="name"
         type="text"
         placeholder="Name"
-        class="input input-bordered {isDanger ? 'input-error' : ''}"
+        class="input {isDanger ? 'input-error' : ''}"
       />
     </div>
     <button class="btn btn-primary btn-outline">
