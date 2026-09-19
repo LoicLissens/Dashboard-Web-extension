@@ -98,6 +98,48 @@ on one machine and a channel added on another both survive.
 
 After a sync that pulls changes, the page reloads so components pick them up.
 
+## Calendars
+
+**Groundwork only — there is no Calendar view yet.** The service layer and a
+check script are in; the settings tab and the view are not, so there is nothing
+to configure from the gear icon.
+
+Both providers go through one path: fetch an iCalendar URL, parse it, render it.
+No OAuth, no backend, no Google Cloud project. Proton has no public API and no
+CalDAV — events are encrypted client-side — so a share link is the only route
+that exists, and using the same mechanism for Google keeps it to one code path.
+
+### Getting the URLs
+
+**Google** — Calendar settings -> pick the calendar in the left sidebar ->
+**Integrate calendar** -> **Secret address in iCal format**:
+
+```
+https://calendar.google.com/calendar/ical/<id>/private-<token>/basic.ics
+```
+
+**Proton** — Calendar -> the calendar's **...** menu -> **Share** ->
+**Share with anyone** -> **Full view** -> copy link:
+
+```
+https://calendar.proton.me/api/calendar/v1/url/<id>/calendar.ics?CacheKey=...&PassphraseKey=...
+```
+
+Proton is explicit that a calendar shared this way sits **outside** the
+end-to-end encryption: their server needs the key carried in the URL to serve
+the `.ics`. Sharing with another Proton user stays E2E encrypted; this does not.
+
+### These URLs are credentials
+
+Each is a bearer token in URL form — holding it is read access to that calendar,
+no login required. Treat them like the GitHub PAT, not like the YouTube key.
+Both are revocable: regenerate the secret address in Google, delete the link in
+Proton (five per calendar, maximum).
+
+Whether they belong in the synced GitHub config is a decision not yet made.
+`SYNCED_KEYS` in `src/helpers/manageStorage.ts` is opt-in, and the GitHub token
+is already excluded on exactly this reasoning.
+
 ## Finding a YouTube channel ID
 
 Channels are added by URL in **Videos -> Register a channel**, which resolves the
