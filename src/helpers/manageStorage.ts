@@ -8,6 +8,7 @@ export enum StorageKeys {
     TASKS = 'tasks',
     NAME = 'name',
     METEO_CACHE = 'meteoCache',
+    CALENDAR = 'calendar',
     SYNC_SETTINGS = 'syncSettings',
     SYNC_STATE = 'syncState',
     SYNC_META = 'syncMeta',
@@ -72,10 +73,42 @@ export const MeteoCacheSchema = z.object({
     todayUnit: z.string(),
 });
 
+/**
+ * A feed is either a live URL we re-fetch, or the text of an .ics exported by
+ * hand. Proton gates share links behind a paid plan, so a free account has only
+ * the export -- a snapshot, which is why `importedAt` is not optional: the UI
+ * has to be able to say how old it is.
+ */
+export const CalendarFeedSchema = z.discriminatedUnion("kind", [
+    z.object({
+        kind: z.literal("url"),
+        id: z.string(),
+        label: z.string(),
+        source: z.enum(["google", "proton"]),
+        url: z.string().url(),
+    }),
+    z.object({
+        kind: z.literal("file"),
+        id: z.string(),
+        label: z.string(),
+        source: z.enum(["google", "proton"]),
+        ics: z.string(),
+        importedAt: z.number(),
+    }),
+]);
+
+export const CalendarConfigSchema = z.object({
+    feeds: z.array(CalendarFeedSchema),
+    daysAhead: z.number().int().min(1).max(365),
+});
+
 export type Video = z.infer<typeof VideoSchema>;
 export type Task = z.infer<typeof TaskSchema>;
 export type Channel = z.infer<typeof ChannelSchema>;
 export type MeteoCache = z.infer<typeof MeteoCacheSchema>;
+export type CalendarConfig = z.infer<typeof CalendarConfigSchema>;
+
+export const DEFAULT_CALENDAR_CONFIG: CalendarConfig = { feeds: [], daysAhead: 14 };
 
 export type Category = string
 export type Categories = Array<Category>
@@ -155,6 +188,10 @@ export const getUserConfigFromStorage = async ():Promise<UserConfig> => {
     const fullStorage = await browser.storage.local.get()
     const excluded: string[] = [
         StorageKeys.METEO_CACHE,
+        // Holds a Google secret address (a bearer credential) and the raw text
+        // of an exported calendar (actual event content). Neither belongs in a
+        // downloadable config file, for the same reason as the GitHub token.
+        StorageKeys.CALENDAR,
         StorageKeys.SYNC_SETTINGS,
         StorageKeys.SYNC_STATE,
         StorageKeys.SYNC_META,
@@ -179,6 +216,13 @@ export const getTasksFromStorage = async (): Promise<Tasks> => {
 export const getMeteoCacheFromStorage = async (): Promise<MeteoCache> => {
     return await getFromBrowserStorage(StorageKeys.METEO_CACHE) as MeteoCache
 }
+export const getCalendarConfigFromStorage = async (): Promise<CalendarConfig> => {
+    const raw = await getFromBrowserStorage(StorageKeys.CALENDAR)
+    const result = CalendarConfigSchema.safeParse(raw)
+    // A malformed blob would otherwise break every new tab with no way back in
+    // through the UI, so fall back rather than throw.
+    return result.success ? result.data : { ...DEFAULT_CALENDAR_CONFIG }
+}
 
 //setter
 export const setVideosToStorage = async (payload: Channels): Promise<void> => {
@@ -195,4 +239,8 @@ export const setFullConfigToStorage = async (payload: UserConfig): Promise<void>
 }
 export const setMeteoCacheToStorage = async (payload: MeteoCache): Promise<void> => {
     await setTobrowserStorage(StorageKeys.METEO_CACHE, payload)
+}
+export const setCalendarConfigToStorage = async (payload: CalendarConfig): Promise<void> => {
+    // Deliberately absent from SYNCED_KEYS: see the exclusion note above.
+    await setTobrowserStorage(StorageKeys.CALENDAR, payload)
 }

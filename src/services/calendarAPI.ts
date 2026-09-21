@@ -2,19 +2,35 @@ import { parseIcs, type CalendarEvent, type CalendarSource, type DateRange } fro
 
 export type { CalendarEvent, CalendarSource, DateRange } from "./icsParser";
 
-/** A feed is one pasted URL: the thing the settings tab will collect. */
-export interface CalendarFeed {
+interface CalendarFeedBase {
     id: string;
     label: string;
     source: CalendarSource;
+}
+
+/** Re-fetched on every load, so it is always current. */
+export interface UrlCalendarFeed extends CalendarFeedBase {
+    kind: "url";
     /**
      * Google: Settings -> <calendar> -> "Secret address in iCal format".
-     * Proton: Share -> "Share with anyone" -> Full view link.
+     * Proton: Share -> "Share with anyone" -> Full view (paid plans only).
      *
      * Either URL is a bearer credential: holding it is read access.
      */
     url: string;
 }
+
+/**
+ * The text of a hand-exported .ics. A snapshot, frozen at `importedAt` -- the
+ * only route open to a free Proton account, since sharing is paid-gated.
+ */
+export interface FileCalendarFeed extends CalendarFeedBase {
+    kind: "file";
+    ics: string;
+    importedAt: number;
+}
+
+export type CalendarFeed = UrlCalendarFeed | FileCalendarFeed;
 
 export class CalendarFeedError extends Error {
     readonly feedId: string;
@@ -48,7 +64,7 @@ export class IcsFeedProvider implements CalendarProvider {
     readonly source: CalendarSource;
     private readonly url: string;
 
-    constructor(feed: CalendarFeed) {
+    constructor(feed: UrlCalendarFeed) {
         this.id = feed.id;
         this.label = feed.label;
         this.source = feed.source;
@@ -56,13 +72,7 @@ export class IcsFeedProvider implements CalendarProvider {
     }
 
     async fetchEvents(range: DateRange): Promise<CalendarEvent[]> {
-        const ics = await this.fetchIcs();
-        try {
-            return parseIcs(ics, range, { feedId: this.id, source: this.source });
-        } catch (e) {
-            const detail = e instanceof Error ? e.message : String(e);
-            throw new CalendarFeedError(this.id, `Feed is not readable iCalendar: ${detail}`);
-        }
+        return parseOrThrow(await this.fetchIcs(), range, this.id, this.source);
     }
 
     private async fetchIcs(): Promise<string> {
@@ -88,6 +98,45 @@ export class IcsFeedProvider implements CalendarProvider {
     }
 }
 
+/**
+ * Serves an .ics imported by hand. Nothing to fetch, so it cannot fail at
+ * runtime -- but it also never changes until the file is re-imported, which is
+ * why `importedAt` is surfaced for the UI to render.
+ */
+export class IcsTextProvider implements CalendarProvider {
+    readonly id: string;
+    readonly label: string;
+    readonly source: CalendarSource;
+    readonly importedAt: number;
+    private readonly ics: string;
+
+    constructor(feed: FileCalendarFeed) {
+        this.id = feed.id;
+        this.label = feed.label;
+        this.source = feed.source;
+        this.importedAt = feed.importedAt;
+        this.ics = feed.ics;
+    }
+
+    async fetchEvents(range: DateRange): Promise<CalendarEvent[]> {
+        return parseOrThrow(this.ics, range, this.id, this.source);
+    }
+}
+
+function parseOrThrow(
+    ics: string,
+    range: DateRange,
+    feedId: string,
+    source: CalendarSource,
+): CalendarEvent[] {
+    try {
+        return parseIcs(ics, range, { feedId, source });
+    } catch (e) {
+        const detail = e instanceof Error ? e.message : String(e);
+        throw new CalendarFeedError(feedId, `Not readable iCalendar: ${detail}`);
+    }
+}
+
 function describeFailure(status: number): string {
     if (status === 401 || status === 403) return `Feed rejected the request (${status}) -- the link may have been revoked`;
     if (status === 404) return "Feed not found -- the link may have been revoked or mistyped";
@@ -97,7 +146,7 @@ function describeFailure(status: number): string {
 
 /** The one place that decides how a feed is talked to. */
 export function createProvider(feed: CalendarFeed): CalendarProvider {
-    return new IcsFeedProvider(feed);
+    return feed.kind === "url" ? new IcsFeedProvider(feed) : new IcsTextProvider(feed);
 }
 
 export interface CalendarFetchResult {

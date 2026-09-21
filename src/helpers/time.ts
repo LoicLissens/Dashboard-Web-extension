@@ -20,6 +20,23 @@ export const msToDate = (timeStamp : number):string => {
     }
     return `${d.dayName} ${d.day} ${d.month} ${d.hours}:${d.minutes}:${d.seconds}`
 };
+/** "today" / "yesterday" / "6 days ago" -- how stale an imported snapshot is. */
+export const daysAgo = (timeStamp: number, now: number = Date.now()): string => {
+    const startOfDay = (t: number) => {
+        const d = new Date(t);
+        d.setHours(0, 0, 0, 0);
+        return d.getTime();
+    };
+    const days = Math.round((startOfDay(now) - startOfDay(timeStamp)) / 86_400_000);
+    if (days <= 0) return "today";
+    if (days === 1) return "yesterday";
+    return `${days} days ago`;
+};
+/** Local parts only: an all-day event is local midnight, so UTC shifts the day. */
+export const dayKey = (date: Date): string => {
+    const pad = (n: number) => String(n).padStart(2, "0");
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+};
 export const timeStringToSeconds = (value:string): number => {
     const splitTime = value.split(":");
     const hour = parseInt(splitTime[0], 10) * 3600;

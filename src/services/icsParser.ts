@@ -34,10 +34,15 @@ export interface CalendarEvent {
     allDay: boolean;
 }
 
-// A recurrence with no UNTIL and no COUNT expands forever. The range end stops
-// the iteration in practice; this is the backstop for a feed that also carries
-// a nonsense DTSTART far in the past.
-const MAX_OCCURRENCES_PER_EVENT = 750;
+// Two separate budgets, because they guard different things.
+//
+// Occurrences are only ever walked forward from DTSTART: ICAL's iterator cannot
+// seek, and re-anchoring it at the range start would change what rules like
+// FREQ=MONTHLY;BYDAY=1MO even mean. So a daily event running since 2019 costs
+// ~2500 steps before it reaches today -- those steps must not count against the
+// number of events we are willing to return, or the event silently vanishes.
+const MAX_EVENTS_PER_RECURRENCE = 750;
+const MAX_STEPS_PER_RECURRENCE = 100_000;
 
 /**
  * Turn one iCalendar document into the events that overlap `range`.
@@ -106,23 +111,42 @@ function collectOccurrences(
         return;
     }
 
+    // An occurrence starting before the window can still run into it, so the
+    // cheap skip below has to allow for the event's own length.
+    const durationMs = Math.max(
+        0,
+        event.endDate.toJSDate().getTime() - event.startDate.toJSDate().getTime(),
+    );
+    const earliestRelevant = range.from.getTime() - durationMs;
+    const rangeEnd = range.to.getTime();
+
     const iterator = event.iterator();
-    for (let seen = 0; seen < MAX_OCCURRENCES_PER_EVENT; seen += 1) {
+    let emitted = 0;
+
+    for (let step = 0; step < MAX_STEPS_PER_RECURRENCE; step += 1) {
         const next = iterator.next();
         if (!next) return;
 
-        const details = event.getOccurrenceDetails(next);
-        const start = details.startDate.toJSDate();
         // Occurrences arrive in ascending order, so the first one past the
         // window means every later one is too.
-        if (start >= range.to) return;
+        const startMs = next.toJSDate().getTime();
+        if (startMs >= rangeEnd) return;
+        // Still behind the window: step over it without paying for
+        // getOccurrenceDetails, and without spending the event budget.
+        if (startMs < earliestRelevant) continue;
+
+        const details = event.getOccurrenceDetails(next);
 
         // `item` is the override component for a modified instance and the
         // master otherwise, so a single cancelled instance drops out here.
         if (isCancelled(details.item.component)) continue;
 
         const occurrence = toCalendarEvent(details.item, details.startDate, details.endDate, origin);
-        if (overlaps(occurrence, range)) out.push(occurrence);
+        if (!overlaps(occurrence, range)) continue;
+
+        out.push(occurrence);
+        emitted += 1;
+        if (emitted >= MAX_EVENTS_PER_RECURRENCE) return;
     }
 }
 

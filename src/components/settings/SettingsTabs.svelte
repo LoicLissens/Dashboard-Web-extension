@@ -1,11 +1,13 @@
 <script context="module" lang="ts">
     import GeneralIcon from "../icons/GeneralIcon.svelte";
     import VideoIcon from "../icons/VideoIcon.svelte";
+    import CalendarIcon from "../icons/CalendarIcon.svelte";
     import { IconSize } from "../icons/BaseIcon.svelte";
 
     export enum Tab {
         General = "general",
         Videos = "videos",
+        Calendar = "calendar",
     }
 </script>
 
@@ -37,6 +39,15 @@
             on:click={() => dispatch("changeTab", Tab.Videos)}
         >
             <VideoIcon size={IconSize.Small} isFocused={false} /> Videos
+        </button>
+        <button
+            role="tab"
+            type="button"
+            class="tab gap-1"
+            class:tab-active={activeTab === Tab.Calendar}
+            on:click={() => dispatch("changeTab", Tab.Calendar)}
+        >
+            <CalendarIcon size={IconSize.Small} /> Calendar
         </button>
     </div>
     <kbd class="kbd kbd-sm">esc</kbd>

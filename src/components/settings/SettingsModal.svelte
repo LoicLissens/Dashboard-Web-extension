@@ -4,6 +4,7 @@
     import { Tab } from "./SettingsTabs.svelte";
     import VideoSettings from "./VideoSettings.svelte";
     import GeneralSettings from "./GeneralSettings.svelte";
+    import CalendarSettings from "./CalendarSettings.svelte";
     import Modal from "../utils/Modal.svelte";
 
     export let isModalActive: boolean;
@@ -27,6 +28,8 @@
             <GeneralSettings />
         {:else if activeTab === Tab.Videos}
             <VideoSettings />
+        {:else if activeTab === Tab.Calendar}
+            <CalendarSettings />
         {/if}
     </div>
 </Modal>
