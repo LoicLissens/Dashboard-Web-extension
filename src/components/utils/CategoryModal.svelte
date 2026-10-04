@@ -1,16 +1,13 @@
 <script lang="ts">
     import { createEventDispatcher } from "svelte";
-    import {
-        setCategoriesToStorage,
-        getCategoriesFromStorage,
-        type Categories,
-        type Category,
-    } from "../../helpers/manageStorage";
-    import { addNotification,NotificationStatus } from "../../store/store";
-    import Modal from "../utils/Modal.svelte";
+    import { type Categories, type Category } from "../../helpers/manageStorage";
+    import { addNotification, NotificationStatus } from "../../store/store";
+    import Modal from "./Modal.svelte";
 
     export let isModalActive: boolean;
+    export let title: string;
     export let existingCategories: Categories;
+    export let lockedCategories: Categories = [];
 
     let categoryToRegister = "";
     let isDanger = false;
@@ -26,7 +23,7 @@
         categoryToRegister = "";
         dispatch("closeModal")
     }
-    const storeCatergory = async (category: Category) => {
+    const storeCatergory = (category: Category) => {
         if (!category){
             isDanger = true;
             return;
@@ -36,21 +33,18 @@
             addNotification(`Category ${category} already exists`, NotificationStatus.Warning);
             return;
         }
-        const stockedCatergories = await getCategoriesFromStorage();
-        await setCategoriesToStorage([...stockedCatergories, category]);
-        dispatch("categoryRegistered", categoryToRegister);
+        dispatch("categoryRegistered", category);
         isDanger = false;
         categoryToRegister = "";
         addNotification("Catergory registered",NotificationStatus.Success);
     };
-    const onPressEnter = async (event: KeyboardEvent) => {
+    const onPressEnter = (event: KeyboardEvent) => {
         if (event.key === "Enter") {
             event.preventDefault(); // Prevent form submission
-            await storeCatergory(categoryToRegister);
+            storeCatergory(categoryToRegister);
         }
     };
-    const deleteCategory = async (category: Category) => {
-        await setCategoriesToStorage(existingCategories.filter((e) => e !== category));
+    const deleteCategory = (category: Category) => {
         dispatch("categoryDeleted", category);
         addNotification(`Categorie ${category} deleted !`, NotificationStatus.Success);
     };
@@ -59,7 +53,7 @@
 <Modal {isModalActive} on:closeModal={closeModal}>
     <div class="flex items-center justify-between">
         <h1 class="text-2xl font-semibold text-center text-base-content/60">
-            Register a video category
+            {title}
         </h1>
         <kbd class="kbd kbd-sm">esc</kbd>
     </div>
@@ -84,11 +78,11 @@
         <div class="flex flex-wrap gap-1">
             {#each existingCategories as category}
                 <span class="badge gap-1"
-                    >{category}<button
-                        class="btn btn-xs btn-circle btn-ghost"
-                        aria-label={`Delete category ${category}`}
-                        on:click={()=>deleteCategory(category)}
-                    >✕</button></span
+                    >{category}{#if !lockedCategories.includes(category)}<button
+                            class="btn btn-xs btn-circle btn-ghost"
+                            aria-label={`Delete category ${category}`}
+                            on:click={()=>deleteCategory(category)}
+                        >✕</button>{/if}</span
                 >
             {/each}
         </div>

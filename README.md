@@ -93,7 +93,7 @@ on one machine and a channel added on another both survive.
 
 | | |
 |---|---|
-| **Synced** | categories, theme, channels, tasks, name, YouTube API key |
+| **Synced** | categories, theme, channels, tasks, task categories, name, YouTube API key |
 | **Not synced** | weather cache (device geolocation), sync settings and token |
 
 After a sync that pulls changes, the page reloads so components pick them up.

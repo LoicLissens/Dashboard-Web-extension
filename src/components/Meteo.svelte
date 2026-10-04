@@ -10,13 +10,17 @@
     import { addNotification, NotificationStatus } from "../store/store";
     import { type OpenMeteoForecastResponse } from "../services/types";
 
-    let currTemp: number;
+    const GEOLOCATION_TIMEOUT_MS = 20_000;
+
+    let currTemp: number | undefined;
     let currUnit: string;
     let todayMaxTemp: number;
     let todayMinTemp: number;
     let todayUnit: string;
     let isUpdatingMeteoData: boolean = false;
 
+    // Not `!!currTemp`: 0°C is a real reading, and falsy.
+    $: hasData = currTemp !== undefined;
     $: max = todayMaxTemp + todayUnit;
     $: min = todayMinTemp + todayUnit;
     $: curr = currTemp + currUnit;
@@ -38,43 +42,49 @@
         }
         return useCachedData;
     }
+    function currentPosition(): Promise<GeolocationPosition> {
+        return new Promise((resolve, reject) =>
+            navigator.geolocation.getCurrentPosition(resolve, reject, {
+                enableHighAccuracy: false,
+                timeout: GEOLOCATION_TIMEOUT_MS,
+                maximumAge: 0, // No cache
+            }),
+        );
+    }
     async function retrieveMeteodataWithGeolocation(): Promise<void> {
         isUpdatingMeteoData = true;
-        const options = {
-            enableHighAccuracy: false,
-            timeout: Infinity, // No timeout
-            maximumAge: 0, // No cache
-        };
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const latitude = position.coords.latitude;
-                const longitude = position.coords.longitude;
-                const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-                const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&timezone=${tz}&current=temperature_2m&daily=temperature_2m_max,temperature_2m_min&forecast_days=1`;
-                axios.get<OpenMeteoForecastResponse>(url).then((r) => {
-                    let data = r.data;
-                    currTemp = data.current.temperature_2m;
-                    currUnit = data.current_units.temperature_2m;
-                    todayMaxTemp = data.daily.temperature_2m_max[0];
-                    todayMinTemp = data.daily.temperature_2m_min[0];
-                    todayUnit = data.daily_units.temperature_2m_max;
+        try {
+            const { latitude, longitude } = (await currentPosition()).coords;
+            const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&timezone=${tz}&current=temperature_2m&daily=temperature_2m_max,temperature_2m_min&forecast_days=1`;
+            const { data } = await axios.get<OpenMeteoForecastResponse>(url);
 
-                    setMeteoCacheToStorage({
-                        createdAt: Date.now(),
-                        currTemp: currTemp,
-                        currUnit: currUnit,
-                        todayMaxTemp: todayMaxTemp,
-                        todayMinTemp: todayMinTemp,
-                        todayUnit: todayUnit,
-                    }).then(() => {
-                        isUpdatingMeteoData = false;
-                        addNotification("Meteo data updated", NotificationStatus.Success);
-                    });
-                });
-            },
-            () => addNotification("Couldn't retrieve geolocation data, unable to get meteo data",NotificationStatus.Error),
-            options,
-        );
+            currTemp = data.current.temperature_2m;
+            currUnit = data.current_units.temperature_2m;
+            todayMaxTemp = data.daily.temperature_2m_max[0];
+            todayMinTemp = data.daily.temperature_2m_min[0];
+            todayUnit = data.daily_units.temperature_2m_max;
+
+            await setMeteoCacheToStorage({
+                createdAt: Date.now(),
+                currTemp: data.current.temperature_2m,
+                currUnit,
+                todayMaxTemp,
+                todayMinTemp,
+                todayUnit,
+            });
+            addNotification("Meteo data updated", NotificationStatus.Success);
+        } catch (e) {
+            // Any cached reading stays on screen; only the spinner goes away.
+            addNotification(
+                e instanceof GeolocationPositionError
+                    ? "Couldn't retrieve geolocation data, unable to get meteo data"
+                    : "Couldn't reach the weather service",
+                NotificationStatus.Error,
+            );
+        } finally {
+            isUpdatingMeteoData = false;
+        }
     }
     async function getMeteoData() {
         const useCachedData = await retrieveCachedMeteoData();
@@ -93,7 +103,7 @@
     });
 </script>
 
-<div class="flex items-center gap-2 {!currTemp ? 'skeleton h-6 w-40' : ''}">
+<div class="flex items-center gap-2 {!hasData ? 'skeleton h-6 w-40' : ''}">
     <span>{curr}</span>
     <span>
         <span class="inline-flex items-center justify-center size-4">
@@ -101,7 +111,7 @@
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 stroke-width="1.5"
-                stroke={currTemp ? "#E84545" : "currentColor"}
+                stroke={hasData ? "#E84545" : "currentColor"}
                 width="1rem"
                 height="1rem"
             >
@@ -120,7 +130,7 @@
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 stroke-width="1.5"
-                stroke={currTemp ? "#256fff" : "currentColor"}
+                stroke={hasData ? "#256fff" : "currentColor"}
                 width="1rem"
                 height="1rem"
             >
@@ -133,10 +143,10 @@
         </span>
         <span>{min}</span>
     </span>
-    {#if isUpdatingMeteoData && currTemp}
+    {#if isUpdatingMeteoData && hasData}
         <span class="loading loading-spinner loading-xs ml-1"></span>
         <Tooltip
-            tooltipText="Meteo data are outdated, udate is ongoing"
+            tooltipText="Meteo data are outdated, update is ongoing"
             position="bottom"><QuestionMarkIcon /></Tooltip
         >
     {/if}

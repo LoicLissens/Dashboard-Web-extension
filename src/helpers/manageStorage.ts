@@ -6,6 +6,7 @@ export enum StorageKeys {
     VIDEO = 'video',
     YOUTUBEAPIKEY = 'youtube',
     TASKS = 'tasks',
+    TASK_CATEGORIES = 'taskCategories',
     NAME = 'name',
     METEO_CACHE = 'meteoCache',
     CALENDAR = 'calendar',
@@ -20,6 +21,7 @@ export const SYNCED_KEYS = [
     StorageKeys.VIDEO,
     StorageKeys.YOUTUBEAPIKEY,
     StorageKeys.TASKS,
+    StorageKeys.TASK_CATEGORIES,
     StorageKeys.NAME,
 ] as const;
 
@@ -37,16 +39,27 @@ export enum Page {
     HOME = 'Home',
     VIDEOS = 'Videos',
 }
+export enum Priority {
+    URGENT = 'urgent',
+    HIGH = 'high',
+    MEDIUM = 'medium',
+    LOW = 'low',
+}
 export const VideoSchema = z.object({
     title: z.string(),
     thumbnail: z.string(),
     id: z.string(),
 });
 
+export const TASK_CATEGORY_PERSO = "Perso";
+export const TASK_CATEGORY_WORK = "Work";
+export const BUILT_IN_TASK_CATEGORIES = [TASK_CATEGORY_PERSO, TASK_CATEGORY_WORK];
+
 export const TaskSchema = z.object({
     id: z.string().optional(),
     label: z.string(),
-    hour: z.string().optional(),
+    priority: z.nativeEnum(Priority).default(Priority.MEDIUM),
+    category: z.string().default(TASK_CATEGORY_PERSO),
     done: z.boolean().optional(),
 });
 
@@ -122,6 +135,7 @@ export const OptionalUserConfigSchema = z.object({
         message: "La clé API YouTube doit être au format valide"
     }),
     tasks: z.array(TaskSchema),
+    taskCategories: z.array(z.string()),
     video: z.array(ChannelSchema),
 }).partial()
 export const UserConfigSchema = OptionalUserConfigSchema.extend({
@@ -210,8 +224,16 @@ export const getCategoriesFromStorage = async (): Promise<Categories> => {
     return categories ? [...categories] : []
 }
 export const getTasksFromStorage = async (): Promise<Tasks> => {
-    const tasks = await getFromBrowserStorage(StorageKeys.TASKS) as Tasks
-    return tasks ? [...tasks] : []
+    const raw = await getFromBrowserStorage(StorageKeys.TASKS)
+    if (!Array.isArray(raw)) return []
+    return raw.flatMap((item) => {
+        const result = TaskSchema.safeParse(item)
+        return result.success ? [result.data] : []
+    })
+}
+export const getTaskCategoriesFromStorage = async (): Promise<Categories> => {
+    const categories = await getFromBrowserStorage(StorageKeys.TASK_CATEGORIES) as Categories
+    return categories ? [...categories] : []
 }
 export const getMeteoCacheFromStorage = async (): Promise<MeteoCache> => {
     return await getFromBrowserStorage(StorageKeys.METEO_CACHE) as MeteoCache
@@ -234,8 +256,23 @@ export const setCategoriesToStorage = async (payload: Categories): Promise<void>
 export const setTasksToStorage = async (payload: Tasks): Promise<void> => {
     await setTobrowserStorage(StorageKeys.TASKS, payload)
 }
-export const setFullConfigToStorage = async (payload: UserConfig): Promise<void> => {
-    await browser.storage.local.set(payload)
+export const setTaskCategoriesToStorage = async (payload: Categories): Promise<void> => {
+    await setTobrowserStorage(StorageKeys.TASK_CATEGORIES, payload)
+}
+export const importUserConfig = async (config: UserConfig): Promise<void> => {
+    const imported = config as Record<string, unknown>
+    // A synced key the file does not carry is replaced by nothing, as before.
+    const absent = SYNCED_KEYS.filter((key) => imported[key] === undefined)
+    await browser.storage.local.remove(absent)
+    await browser.storage.local.set(config)
+
+    const meta = await getSyncMeta()
+    const now = Date.now()
+    for (const key of SYNCED_KEYS) {
+        if (imported[key] === undefined) delete meta[key]
+        else meta[key] = now
+    }
+    await setSyncMeta(meta)
 }
 export const setMeteoCacheToStorage = async (payload: MeteoCache): Promise<void> => {
     await setTobrowserStorage(StorageKeys.METEO_CACHE, payload)

@@ -1,8 +1,7 @@
 <script lang="ts">
     import {
-        clearStorage,
         validateUserConfig,
-        setFullConfigToStorage,
+        importUserConfig,
     } from "../../helpers/manageStorage";
     import { addNotification, NotificationStatus } from "../../store/store";
 
@@ -22,8 +21,7 @@
                 const content = e.target?.result as string;
                 const parsedData: unknown = JSON.parse(content);
                 const userConfig = validateUserConfig(parsedData);
-                await clearStorage();
-                await setFullConfigToStorage(userConfig);
+                await importUserConfig(userConfig);
                 window.location.reload();
             } catch (error) {
                 addNotification("Invalid config file",NotificationStatus.Error)

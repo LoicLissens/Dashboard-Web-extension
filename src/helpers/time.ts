@@ -18,7 +18,8 @@ export const msToDate = (timeStamp : number):string => {
         minutes: time.getMinutes(),
         seconds : time.getSeconds()
     }
-    return `${d.dayName} ${d.day} ${d.month} ${d.hours}:${d.minutes}:${d.seconds}`
+    const pad = (n: number) => String(n).padStart(2, "0");
+    return `${d.dayName} ${d.day} ${d.month} ${d.hours}:${pad(d.minutes)}:${pad(d.seconds)}`
 };
 /** "today" / "yesterday" / "6 days ago" -- how stale an imported snapshot is. */
 export const daysAgo = (timeStamp: number, now: number = Date.now()): string => {
@@ -37,9 +38,8 @@ export const dayKey = (date: Date): string => {
     const pad = (n: number) => String(n).padStart(2, "0");
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 };
-export const timeStringToSeconds = (value:string): number => {
-    const splitTime = value.split(":");
-    const hour = parseInt(splitTime[0], 10) * 3600;
-    const min = parseInt(splitTime[1], 10) * 60;
-    return hour + min
+export const isWorkingHours = (date: Date): boolean => {
+    const day = date.getDay();
+    const hours = date.getHours();
+    return day >= 1 && day <= 5 && hours >= 8 && hours < 17;
 };

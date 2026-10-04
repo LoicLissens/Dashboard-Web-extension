@@ -4,10 +4,14 @@
     export let title: string;
     /** Tailwind text-size utility for the title. */
     export let titleSize = "text-3xl";
+    export let badge: number = 0;
 </script>
 
 <div class="flex items-center gap-2 text-base-content/60 mt-1">
     <span><p class="{titleSize} font-bold">{title}</p></span>
+    {#if badge > 0}
+        <span class="badge badge-primary badge-sm">{badge}</span>
+    {/if}
     <button
         type="button"
         class="flex cursor-pointer"

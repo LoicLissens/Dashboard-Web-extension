@@ -1,14 +1,6 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-    import { getCalendarConfigFromStorage } from "../helpers/manageStorage";
-    import {
-        createProvider,
-        fetchCalendarEvents,
-        rangeForDays,
-        IcsTextProvider,
-        type CalendarEvent,
-        type CalendarProvider,
-    } from "../services/calendarAPI";
+    import { type CalendarEvent } from "../services/calendarAPI";
+    import { calendar } from "../store/calendar";
     import { daysAgo, dayKey } from "../helpers/time";
 
     interface Day {
@@ -17,12 +9,8 @@
         events: CalendarEvent[];
     }
 
-    let isLoading = true;
-    let days: Day[] = [];
-    let errors: string[] = [];
-    /** Feeds that are frozen snapshots, so the agenda can admit how old it is. */
-    let snapshots: { label: string; importedAt: number }[] = [];
-    let hasFeeds = false;
+    $: ({ isLoading, hasFeeds, errors, snapshots } = $calendar);
+    $: days = groupByDay($calendar.events);
 
     const timeFormat = new Intl.DateTimeFormat(undefined, {
         hour: "2-digit",
@@ -47,34 +35,6 @@
         }
         return [...byDay.values()];
     }
-
-    async function load() {
-        isLoading = true;
-        try {
-            const config = await getCalendarConfigFromStorage();
-            hasFeeds = config.feeds.length > 0;
-            if (!hasFeeds) {
-                days = [];
-                return;
-            }
-
-            const providers: CalendarProvider[] = config.feeds.map(createProvider);
-            snapshots = providers
-                .filter((p): p is IcsTextProvider => p instanceof IcsTextProvider)
-                .map((p) => ({ label: p.label, importedAt: p.importedAt }));
-
-            const result = await fetchCalendarEvents(
-                providers,
-                rangeForDays(config.daysAhead),
-            );
-            days = groupByDay(result.events);
-            errors = result.errors.map((e) => e.message);
-        } finally {
-            isLoading = false;
-        }
-    }
-
-    onMount(load);
 </script>
 
 <div>

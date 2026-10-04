@@ -3,13 +3,14 @@
     import youtubeAPI from "../../services/youtubeAPI";
     import {
         setVideosToStorage,
+        setCategoriesToStorage,
         type Categories,
         type Category,
         type Channels
     } from "../../helpers/manageStorage";
     import { addNotification, NotificationStatus } from "../../store/store";
 
-    import RegisterCategoryModal from "./RegisterCategoryModal.svelte";
+    import CategoryModal from "../utils/CategoryModal.svelte";
     import Tooltip from "../utils/Tooltip.svelte";
     import QuestionMarkIcon from "../icons/QuestionMarkIcon.svelte";
 
@@ -27,6 +28,15 @@
 
     function closeModal() {
         isModalActive = false;
+    }
+    async function registerCategory(category: Category) {
+        categories = [...categories, category];
+        await setCategoriesToStorage(categories);
+        closeModal();
+    }
+    async function deleteCategory(category: Category) {
+        categories = categories.filter((c) => c !== category);
+        await setCategoriesToStorage(categories);
     }
     const storeChannelInfo = async (
         InputChannelURL: string,
@@ -62,15 +72,12 @@
 
 </script>
 
-<RegisterCategoryModal
+<CategoryModal
     {isModalActive}
+    title="Video categories"
     existingCategories={categories}
-    on:categoryRegistered={(e) => (
-        (categories = [...categories, e.detail]), closeModal()
-    )}
-    on:categoryDeleted={(e) => {
-        categories = categories.filter((c) => c !== e.detail);
-    }}
+    on:categoryRegistered={(e) => registerCategory(e.detail)}
+    on:categoryDeleted={(e) => deleteCategory(e.detail)}
     on:closeModal={closeModal}
 />
 <div class="my-3 card bg-base-100 shadow-md"><div class="card-body">

@@ -4,14 +4,15 @@
   import Colors from "../components/Colors.svelte";
   import Calendar from "../components/Calendar.svelte";
   import Expander from '../components/utils/Expander.svelte';
+  import { eventsTodayCount } from "../store/calendar";
 </script>
 
 <section class="w-[70%] mx-auto" in:fade|global>
-  <Expander expanded={true} title="Agenda">
-    <Calendar />
-  </Expander>
-  <Expander title="Task">
+  <Expander expanded={true} title="Task">
     <Todo />
+  </Expander>
+  <Expander title="Agenda" badge={$eventsTodayCount}>
+    <Calendar />
   </Expander>
   <Expander expanded={true} title="Colors Widget">
     <Colors />

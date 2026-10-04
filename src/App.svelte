@@ -12,7 +12,7 @@
   notifications.subscribe((value) => {
     notificationsList = value;
   });
-  let state = Page.VIDEOS;
+  let state = Page.HOME;
 
 </script>
 
