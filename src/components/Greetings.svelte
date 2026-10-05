@@ -6,6 +6,7 @@
   import RegisterModal from "./RegisterModal.svelte";
 
   let name = "";
+  let isNameLoaded = false;
 
   function setName(registeredName: string) {
       setTobrowserStorage(StorageKeys.NAME, registeredName)
@@ -23,11 +24,12 @@
       })
       .catch((err) => {
         console.error(err);
-      });
+      })
+      .finally(() => (isNameLoaded = true));
   });
 </script>
 
-<RegisterModal isModalActive={!name} on:setName={e => setName(e.detail.name)} />
+<RegisterModal isModalActive={isNameLoaded && !name} on:setName={e => setName(e.detail.name)} />
 <div class="flex items-center gap-2">
   <p class="text-sm text-base-content/60">{msToDate($date)}</p>
   {#if name}

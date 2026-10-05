@@ -5,6 +5,7 @@
   import General from "./views/Home.svelte";
   import Sidebar from "./components/layout/Sidebar.svelte";
   import Videos from "./views/Videos.svelte";
+  import Tool from "./views/Tool.svelte";
   import Notification from "./components/Notification.svelte";
   import Navbar from "./components/layout/Navbar.svelte";
 
@@ -33,6 +34,8 @@
     <General />
   {:else if state ===  Page.VIDEOS}
     <Videos />
+  {:else if state === Page.TOOL}
+    <Tool />
   {/if}
 </main>
 

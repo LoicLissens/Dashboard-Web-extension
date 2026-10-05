@@ -10,12 +10,7 @@
 	     wrong theme. chrome.storage is async and cannot be read this early, so
 	     Theme.svelte mirrors the choice into localStorage purely as a
 	     paint-time hint; chrome.storage remains the source of truth. -->
-	<script>
-		try {
-			var t = localStorage.getItem('theme');
-			if (t) document.documentElement.setAttribute('data-theme', t);
-		} catch (e) {}
-	</script>
+	<script src='/theme-init.js'></script>
 
 	<link rel='icon' type='image/png' href='/favicon.png'>
 	<link rel='stylesheet' href='/build/tailwind.css'>

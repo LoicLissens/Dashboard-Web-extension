@@ -10,6 +10,7 @@ export enum StorageKeys {
     NAME = 'name',
     METEO_CACHE = 'meteoCache',
     CALENDAR = 'calendar',
+    POMODORO = 'pomodoro',
     SYNC_SETTINGS = 'syncSettings',
     SYNC_STATE = 'syncState',
     SYNC_META = 'syncMeta',
@@ -38,6 +39,7 @@ export enum Theme {
 export enum Page {
     HOME = 'Home',
     VIDEOS = 'Videos',
+    TOOL = 'Tool',
 }
 export enum Priority {
     URGENT = 'urgent',
@@ -206,6 +208,7 @@ export const getUserConfigFromStorage = async ():Promise<UserConfig> => {
         // of an exported calendar (actual event content). Neither belongs in a
         // downloadable config file, for the same reason as the GitHub token.
         StorageKeys.CALENDAR,
+        StorageKeys.POMODORO,
         StorageKeys.SYNC_SETTINGS,
         StorageKeys.SYNC_STATE,
         StorageKeys.SYNC_META,

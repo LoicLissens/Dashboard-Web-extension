@@ -3,6 +3,7 @@
     import Theme from "../Theme.svelte";
     import Meteo from "../Meteo.svelte";
     import Settings from "../settings/Settings.svelte";
+    import Pomodoro from "../Pomodoro.svelte";
 </script>
 
 <!-- daisyUI has no `navbar-item` and no fixed-position modifier, so the
@@ -15,6 +16,7 @@
         <Meteo />
     </div>
     <div class="navbar-end gap-2">
+        <Pomodoro />
         <Settings />
         <Theme />
     </div>

@@ -1,7 +1,6 @@
 <script lang="ts">
   import {fade} from 'svelte/transition';
   import Todo from "../components/Todo.svelte";
-  import Colors from "../components/Colors.svelte";
   import Calendar from "../components/Calendar.svelte";
   import Expander from '../components/utils/Expander.svelte';
   import { eventsTodayCount } from "../store/calendar";
@@ -13,8 +12,5 @@
   </Expander>
   <Expander title="Agenda" badge={$eventsTodayCount}>
     <Calendar />
-  </Expander>
-  <Expander expanded={true} title="Colors Widget">
-    <Colors />
   </Expander>
 </section>

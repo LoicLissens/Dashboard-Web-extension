@@ -14,8 +14,9 @@
     type Category,
   } from "../helpers/manageStorage";
   import { onMount } from "svelte";
-  import { fade, slide } from "svelte/transition";
+  import { slide } from "svelte/transition";
   import { isWorkingHours } from "../helpers/time";
+  import { addNotification, NotificationStatus } from "../store/store";
   import CategoryModal from "./utils/CategoryModal.svelte";
 
   const PRIORITIES = [Priority.URGENT, Priority.HIGH, Priority.MEDIUM, Priority.LOW];
@@ -44,12 +45,16 @@
     : TASK_CATEGORY_PERSO;
   let isCategoryModalActive = false;
   let isLoading = false;
-  let errorMessage = "";
-  let successMessage = "";
+  let editingTask: Task | null = null;
+  let editLabel = "";
+  let editPriority = Priority.MEDIUM;
+  let editCategory: Category = TASK_CATEGORY_PERSO;
 
   $: categories = [...BUILT_IN_TASK_CATEGORIES, ...customCategories];
   $: sortedTasks = tasks.sort(
-    (a, b) => PRIORITIES.indexOf(a.priority) - PRIORITIES.indexOf(b.priority),
+    (a, b) =>
+      Number(Boolean(a.done)) - Number(Boolean(b.done)) ||
+      PRIORITIES.indexOf(a.priority) - PRIORITIES.indexOf(b.priority),
   );
   $: visibleTasks = sortedTasks.filter(
     (task) =>
@@ -58,20 +63,6 @@
   );
   $: disabledButton = !newTask.label;
 
-  function showSuccess(message: string) {
-    successMessage = message;
-    setTimeout(() => {
-      successMessage = "";
-    }, 3000);
-  }
-
-  function showError(message: string) {
-    errorMessage = message;
-    setTimeout(() => {
-      errorMessage = "";
-    }, 3000);
-  }
-
   async function addTask() {
     if (!newTask.label) return;
 
@@ -79,13 +70,13 @@
     try {
       // Check for duplicate tasks
       if (tasks.some((task) => task.label === newTask.label)) {
-        showError("Task already exists!");
+        addNotification("Task already exists!", NotificationStatus.Error);
         return;
       }
 
       tasks = [...tasks, { ...newTask, category: selectedCategory }];
       await setTasksToStorage(tasks);
-      showSuccess("Task added successfully!");
+      addNotification("Task added successfully!", NotificationStatus.Success);
 
       newTask = {
         label: "",
@@ -94,7 +85,7 @@
       };
     } catch (err) {
       console.error(err);
-      showError("Failed to add task!");
+      addNotification("Failed to add task!", NotificationStatus.Error);
     } finally {
       isLoading = false;
     }
@@ -106,10 +97,10 @@
       const newArray = tasks.filter((task) => task.label !== taskLabel);
       tasks = [...newArray];
       await setTasksToStorage(tasks);
-      showSuccess("Task removed successfully!");
+      addNotification("Task removed successfully!", NotificationStatus.Success);
     } catch (err) {
       console.error(err);
-      showError("Failed to remove task!");
+      addNotification("Failed to remove task!", NotificationStatus.Error);
     } finally {
       isLoading = false;
     }
@@ -117,15 +108,51 @@
 
   async function updateTask() {
     isLoading = true;
+    tasks = tasks;
     try {
       await setTasksToStorage(tasks);
-      showSuccess("Task updated!");
+      addNotification("Task updated!", NotificationStatus.Success);
     } catch (err) {
       console.error(err);
-      showError("Failed to update task!");
+      addNotification("Failed to update task!", NotificationStatus.Error);
     } finally {
       isLoading = false;
     }
+  }
+
+  function startEdit(task: Task) {
+    editingTask = task;
+    editLabel = task.label;
+    editPriority = task.priority;
+    editCategory = task.category;
+  }
+
+  function cancelEdit() {
+    editingTask = null;
+  }
+
+  async function saveEdit() {
+    if (!editingTask || !editLabel) return;
+    if (editLabel !== editingTask.label && tasks.some((task) => task.label === editLabel)) {
+      addNotification("Task already exists!", NotificationStatus.Error);
+      return;
+    }
+    Object.assign(editingTask, {
+      label: editLabel,
+      priority: editPriority,
+      category: editCategory,
+    });
+    editingTask = null;
+    await updateTask();
+  }
+
+  function onEditKeydown(event: KeyboardEvent) {
+    if (event.key === "Enter") saveEdit();
+    if (event.key === "Escape") cancelEdit();
+  }
+
+  function focus(node: HTMLInputElement) {
+    node.focus();
   }
 
   async function registerCategory(category: Category) {
@@ -158,7 +185,7 @@
       customCategories = storedCategories;
     } catch (err) {
       console.error(err);
-      showError("Failed to load tasks!");
+      addNotification("Failed to load tasks!", NotificationStatus.Error);
     } finally {
       isLoading = false;
     }
@@ -166,28 +193,6 @@
 </script>
 
 <div class="flex flex-col gap-2">
-        {#if errorMessage}
-          <div class="alert alert-error alert-soft" transition:fade>
-            <span>{errorMessage}</span>
-            <button
-              class="btn btn-sm btn-circle btn-ghost"
-              aria-label="Dismiss error"
-              on:click={() => (errorMessage = "")}>✕</button
-            >
-          </div>
-        {/if}
-
-        {#if successMessage}
-          <div class="alert alert-success alert-soft" transition:fade>
-            <span>{successMessage}</span>
-            <button
-              class="btn btn-sm btn-circle btn-ghost"
-              aria-label="Dismiss message"
-              on:click={() => (successMessage = "")}>✕</button
-            >
-          </div>
-        {/if}
-
         <CategoryModal
           isModalActive={isCategoryModalActive}
           title="Task categories"
@@ -249,7 +254,7 @@
         {#if visibleTasks.length > 0}
           <div>
             <div class="task-list">
-              {#each visibleTasks as task (task.label)}
+              {#each visibleTasks as task (task)}
                 <div
                   class="card mb-2 transition-colors {task.done
                     ? 'bg-success/20'
@@ -257,32 +262,77 @@
                   transition:slide
                 >
                   <div class="card-body flex-row items-center gap-3 py-3">
-                    <input
-                      type="checkbox"
-                      class="checkbox shrink-0"
-                      aria-label="Mark task done"
-                      bind:checked={task.done}
-                      on:change={updateTask}
-                    />
-                    <span
-                      class="badge badge-soft w-20 shrink-0 {PRIORITY_BADGE[
-                        task.priority
-                      ]}">{PRIORITY_LABEL[task.priority]}</span
-                    >
-                    <span
-                      class="flex-1 {task.done
-                        ? 'line-through text-base-content/40'
-                        : ''}"
-                    >
-                      {task.label}
-                    </span>
-                    <button
-                      class="btn btn-sm btn-error btn-soft shrink-0"
-                      on:click={() => removeTask(task.label)}
-                      title="Delete task"
-                    >
-                      Delete
-                    </button>
+                    {#if editingTask === task}
+                      <input
+                        class="input input-sm flex-1 min-w-32"
+                        aria-label="Task name"
+                        bind:value={editLabel}
+                        on:keydown={onEditKeydown}
+                        use:focus
+                      />
+                      <select
+                        class="select select-sm w-28 shrink-0"
+                        aria-label="Priority"
+                        bind:value={editPriority}
+                      >
+                        {#each PRIORITIES as priority}
+                          <option value={priority}>{PRIORITY_LABEL[priority]}</option>
+                        {/each}
+                      </select>
+                      <select
+                        class="select select-sm w-32 shrink-0"
+                        aria-label="Category"
+                        bind:value={editCategory}
+                      >
+                        {#each categories as category}
+                          <option value={category}>{category}</option>
+                        {/each}
+                      </select>
+                      <button
+                        class="btn btn-sm btn-primary btn-soft shrink-0"
+                        disabled={!editLabel}
+                        on:click={saveEdit}
+                      >
+                        Save
+                      </button>
+                      <button class="btn btn-sm btn-ghost shrink-0" on:click={cancelEdit}>
+                        Cancel
+                      </button>
+                    {:else}
+                      <input
+                        type="checkbox"
+                        class="checkbox shrink-0"
+                        aria-label="Mark task done"
+                        bind:checked={task.done}
+                        on:change={updateTask}
+                      />
+                      <span
+                        class="badge badge-soft w-20 shrink-0 {PRIORITY_BADGE[
+                          task.priority
+                        ]}">{PRIORITY_LABEL[task.priority]}</span
+                      >
+                      <span
+                        class="flex-1 {task.done
+                          ? 'line-through text-base-content/40'
+                          : ''}"
+                      >
+                        {task.label}
+                      </span>
+                      <button
+                        class="btn btn-sm btn-ghost shrink-0"
+                        on:click={() => startEdit(task)}
+                        title="Edit task"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        class="btn btn-sm btn-error btn-soft shrink-0"
+                        on:click={() => removeTask(task.label)}
+                        title="Delete task"
+                      >
+                        Delete
+                      </button>
+                    {/if}
                   </div>
                 </div>
               {/each}
